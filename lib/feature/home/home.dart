@@ -1,17 +1,59 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_academy/core/theme/apptheme.dart';
+import 'package:smart_academy/feature/Notifications/presentation/notifications.dart';
+import 'package:smart_academy/feature/chat/presentation/chat.dart';
+import 'package:smart_academy/feature/dashbord/presentation/dashbord.dart';
+import 'package:smart_academy/feature/person/presentation/person.dart';
 
-class HomeScreen extends StatelessWidget{
+class HomeScreen extends StatefulWidget{
 static const  String routeName="home";
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int select=0;
   @override
   Widget build(BuildContext context) {
+    List<Widget> item=[
+      Dashbord(),
+      Chat(),
+      Notifications(),
+      Person(),
+    ];
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(image: AssetImage("assets/image/background.png"),fit: BoxFit.fill),
       ),
       child: Scaffold(
         appBar: AppBar(title: Text("Welcome"),),
+          body: item[select],
+
+        bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.shifting,
+            selectedItemColor: AppTheme.blu,
+            unselectedItemColor: Colors.black,
+
+            currentIndex: select,
+
+            onTap: (index){
+              select=index;
+              setState(() {
+
+              });
+            },
+            items: [
+
+              BottomNavigationBarItem(icon: Icon(Icons.dashboard,size: 35,),label: "dashbord",),
+              BottomNavigationBarItem(icon: Icon(Icons.chat,size: 35,),label: "chat"),
+              BottomNavigationBarItem(icon: Icon(Icons.notification_important_rounded,size: 35,),label: "Notifications"),
+              BottomNavigationBarItem(icon: Icon(Icons.person ,size: 35,),label: "person"),
+        ]),
+        // appBar: AppBar(title: Text("Welcome"),),
 
       ),
     );

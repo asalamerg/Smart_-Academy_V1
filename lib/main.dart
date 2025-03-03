@@ -13,13 +13,14 @@ class SmartAcademy extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+
    return MaterialApp(
      debugShowCheckedModeBanner: false,
     routes: {
       HomeScreen.routeName :(context)=>HomeScreen(),
       Login.routeName :(context)=>Login(),
       Register.routeName :(context)=>Register(),
-    },initialRoute: Login.routeName,
+    },initialRoute: HomeScreen.routeName,
      theme: AppTheme.light,
      themeMode: ThemeMode.light,
    );

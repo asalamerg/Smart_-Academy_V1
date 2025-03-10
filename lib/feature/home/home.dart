@@ -1,5 +1,4 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_academy/core/theme/apptheme.dart';
 import 'package:smart_academy/feature/Notifications/presentation/notifications.dart';
@@ -26,11 +25,11 @@ class _HomeScreenState extends State<HomeScreen> {
       Person(),
     ];
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         image: DecorationImage(image: AssetImage("assets/image/background.png"),fit: BoxFit.fill),
       ),
       child: Scaffold(
-        appBar: AppBar(title: Text("Welcome"),),
+        appBar: AppBar(title: const Text("Welcome"),),
           body: item[select],
 
         bottomNavigationBar: BottomNavigationBar(
@@ -46,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               });
             },
-            items: [
+            items: const [
 
               BottomNavigationBarItem(icon: Icon(Icons.dashboard,size: 35,),label: "dashbord",),
               BottomNavigationBarItem(icon: Icon(Icons.chat,size: 35,),label: "chat"),

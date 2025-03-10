@@ -20,7 +20,7 @@ class SmartAcademy extends StatelessWidget{
       HomeScreen.routeName :(context)=>HomeScreen(),
       Login.routeName :(context)=>Login(),
       Register.routeName :(context)=>Register(),
-    },initialRoute: HomeScreen.routeName,
+    },initialRoute: Login.routeName,
      theme: AppTheme.light,
      themeMode: ThemeMode.light,
    );

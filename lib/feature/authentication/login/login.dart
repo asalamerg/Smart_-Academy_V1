@@ -1,5 +1,4 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_academy/feature/authentication/register/register.dart';
 import 'package:smart_academy/feature/authentication/widget/default_button.dart';
@@ -9,6 +8,8 @@ import 'package:smart_academy/feature/home/home.dart';
 
 class Login extends StatefulWidget{
  static const  String routeName="login";
+
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -23,7 +24,7 @@ class _LoginState extends State<Login> {
     return Form(
       key: formKey,
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(image: AssetImage("assets/image/background.png"),fit: BoxFit.fill),
         ),
         child: Scaffold(
@@ -32,19 +33,15 @@ class _LoginState extends State<Login> {
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                DefaultTextFormField(title: "Password",controller: passwordController,validator: validation.password ),
                 DefaultTextFormField(title: "Email",controller: EmailController, validator: validation.email,),
+                DefaultTextFormField(title: "Password",controller: passwordController,validator: validation.password ),
+
 
                  SizedBox(height: MediaQuery.of(context).size.height * 0.20,),
-                DefaultButton(onPressed: (){
-                  if (formKey.currentState!.validate()) {
-                    Login();
-                  }
-
-                },title: "Login",),
+                DefaultButton(onPressed: Login,title: "Login",),
 
 
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
 
                 InkWell(
                     onTap: (){Navigator.of(context).pushNamed(Register.routeName);},
@@ -57,7 +54,10 @@ class _LoginState extends State<Login> {
     );
   }
   void Login(){
-      Navigator.of(context).pushNamed(HomeScreen.routeName);
+    if (formKey.currentState!.validate()) {
+
+      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+    }
 
   }
 

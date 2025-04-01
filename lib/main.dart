@@ -17,7 +17,7 @@ class SmartAcademy extends StatelessWidget{
    return MaterialApp(
      debugShowCheckedModeBanner: false,
     routes: {
-      HomeScreen.routeName :(context)=>HomeScreen(),
+      HomeScreen.routeName :(context)=>const HomeScreen(),
       Login.routeName :(context)=>Login(),
       Register.routeName :(context)=>Register(),
     },initialRoute: Login.routeName,

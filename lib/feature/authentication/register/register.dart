@@ -37,14 +37,7 @@ class _RegisterState extends State<Register> {
             DefaultTextFormField(title: "Password",controller: passwordController,validator: validation.password, ),
             DefaultTextFormField(title: "ID",controller: idController, validator: validation.id,),
               SizedBox(height: MediaQuery.of(context).size.height * 0.10,),
-              DefaultButton(onPressed: (){
-                if (formKey.currentState!.validate()) {
-                  register();
-
-                }
-
-
-              },title: "Register",),
+              DefaultButton(onPressed: register,title: "Register",),
 
 
 
@@ -54,7 +47,12 @@ class _RegisterState extends State<Register> {
     );
   }
   void register(){
-    Navigator.of(context).pushNamed(HomeScreen.routeName);
+    if (formKey.currentState!.validate()) {
+      Navigator.of(context).pushNamed(HomeScreen.routeName);
+
+
+    }
+
   }
 
 }

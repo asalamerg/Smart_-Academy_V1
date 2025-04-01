@@ -9,6 +9,8 @@ import 'package:smart_academy/feature/person/presentation/person.dart';
 class HomeScreen extends StatefulWidget{
 static const  String routeName="home";
 
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 
@@ -29,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
         image: DecorationImage(image: AssetImage("assets/image/background.png"),fit: BoxFit.fill),
       ),
       child: Scaffold(
-        appBar: AppBar(title: const Text("Welcome"),),
+
           body: item[select],
 
         bottomNavigationBar: BottomNavigationBar(

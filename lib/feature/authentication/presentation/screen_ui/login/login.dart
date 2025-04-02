@@ -1,9 +1,15 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_academy/feature/authentication/register/register.dart';
-import 'package:smart_academy/feature/authentication/widget/default_button.dart';
-import 'package:smart_academy/feature/authentication/widget/textformfield.dart';
-import 'package:smart_academy/feature/authentication/widget/validation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_academy/feature/authentication/data/firebaseFunctionUser.dart';
+import 'package:smart_academy/feature/authentication/data/user_provder.dart';
+import 'package:smart_academy/feature/authentication/presentation/screen_ui/register/register.dart';
+import 'package:smart_academy/feature/authentication/presentation/widget/default_button.dart';
+import 'package:smart_academy/feature/authentication/presentation/widget/textformfield.dart';
+import 'package:smart_academy/feature/authentication/presentation/widget/validation.dart';
+
 import 'package:smart_academy/feature/home/home.dart';
 
 
@@ -56,8 +62,30 @@ class _LoginState extends State<Login> {
   }
   void Login(){
     if (formKey.currentState!.validate()) {
+      FunctionFirebaseUser.LoginAccount(
+          EmailController.text ,
+          passwordController.text).
+      then((user){
+        Provider.of<UserProvider>(context,listen: false).UpdateUser(user);
+        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
 
-      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+      }).
+      catchError((error){
+        String ? messages ;
+        if(error is FirebaseAuthException){
+          messages =error.message;
+        }
+        Fluttertoast.showToast(
+            msg:messages ?? " error",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.blue,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      });
+
     }
 
   }

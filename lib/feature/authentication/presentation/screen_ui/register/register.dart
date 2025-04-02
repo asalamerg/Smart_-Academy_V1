@@ -1,13 +1,20 @@
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_academy/feature/authentication/widget/default_button.dart';
-import 'package:smart_academy/feature/authentication/widget/validation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_academy/feature/authentication/data/firebaseFunctionUser.dart';
+import 'package:smart_academy/feature/authentication/data/user_provder.dart';
+import 'package:smart_academy/feature/authentication/presentation/widget/default_button.dart';
+import 'package:smart_academy/feature/authentication/presentation/widget/textformfield.dart';
+import 'package:smart_academy/feature/authentication/presentation/widget/validation.dart';
+
 import 'package:smart_academy/feature/home/home.dart';
 
-import '../widget/textformfield.dart';
 
 class Register extends StatefulWidget{
  static const String routeName="register";
+
+  const Register({super.key});
 
   @override
   State<Register> createState() => _RegisterState();
@@ -24,7 +31,7 @@ class _RegisterState extends State<Register> {
     return Form(
       key:formKey ,
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(image: AssetImage("assets/image/background.png"),fit: BoxFit.fill),
         ),
         child: Scaffold(
@@ -48,7 +55,30 @@ class _RegisterState extends State<Register> {
   }
   void register(){
     if (formKey.currentState!.validate()) {
-      Navigator.of(context).pushNamed(HomeScreen.routeName);
+      FunctionFirebaseUser.RegisterAccount(
+          EmailController.text,
+          NameController.text,
+          idController.text,
+          passwordController.text).
+      then((user){
+        Provider.of<UserProvider>(context ,listen: false).UpdateUser(user);
+        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+      }).
+      catchError((error){
+        String ? messages ;
+        if(error is FirebaseAuthException){
+          messages =error.message;
+        }
+        Fluttertoast.showToast(
+            msg: messages ??  "error",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.blue,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      });
 
 
     }

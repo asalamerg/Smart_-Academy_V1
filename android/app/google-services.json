@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "488099238193",
+    "project_id": "smartacademy-61836",
+    "storage_bucket": "smartacademy-61836.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488099238193:android:db795f458f1fa2ea37e010",
+        "android_client_info": {
+          "package_name": "com.example.smart_academy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-FGV_v1chrR6ehPYs8I9lURKWibYM5kk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

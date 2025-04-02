@@ -1,11 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_academy/core/theme/apptheme.dart';
 import 'package:smart_academy/feature/authentication/login/login.dart';
 import 'package:smart_academy/feature/authentication/register/register.dart';
 import 'package:smart_academy/feature/home/home.dart';
+import 'package:smart_academy/firebase_options.dart';
 
-void main() {
+
+Future<void> main() async {
   runApp( const SmartAcademy());
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 }
 
 class SmartAcademy extends StatelessWidget{

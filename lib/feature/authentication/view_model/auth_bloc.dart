@@ -1,0 +1,43 @@
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_academy/feature/authentication/data/firebaseFunctionUser.dart';
+import 'package:smart_academy/feature/authentication/data/model_user.dart';
+import 'package:smart_academy/feature/authentication/view_model/auth_status.dart';
+
+class AuthBloc extends Cubit<AuthStatus>{
+  AuthBloc(): super(AuthInitial());
+
+  ModelUser? modelUser ;
+  void ChangedUser(ModelUser user){
+    modelUser=user ;
+    emit(AuthChangeUser());
+  }
+
+  Future<void> LoginViewModel({required String email , required String password})async{
+  emit(LoginAuthLoading());
+  try{
+  modelUser=  await  FunctionFirebaseUser.LoginAccount(email, password);
+
+  emit(LoginAuthSuccess());
+
+  }catch(e){
+
+    emit(LoginAuthError(error: e.toString()));
+  }
+
+
+  }
+
+  Future<void> RegistetViewModel({required String name , required String password , required String numberId ,required String email })async{
+    emit(RegisterAuthLoading());
+    try{
+     modelUser=  await FunctionFirebaseUser.RegisterAccount(email, name, numberId, password);
+     emit(RegisterAuthSuccess());
+    }catch(e){
+      emit(RegisterAuthError(error: e.toString()));
+    }
+
+  }
+
+
+}

@@ -33,8 +33,11 @@ dependencies:
   firebase_core: ^3.8.0
   cloud_firestore: ^5.5.0
   firebase_auth: ^5.3.3
-  provider: ^6.1.4
-  fluttertoast: ^8.2.10
+  loading_indicator: ^3.1.1
+
+  fluttertoast: ^8.2.12
+  flutter_bloc: ^9.1.0
+
 
 
 

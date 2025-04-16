@@ -1,5 +1,4 @@
 
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -9,9 +8,11 @@ class AppTheme{
 
  static ThemeData light =ThemeData(
    scaffoldBackgroundColor: Colors.transparent,
-    appBarTheme: AppBarTheme(backgroundColor: Colors.transparent),
-    textTheme: TextTheme(displayLarge:TextStyle(color: Colors.white , fontFamily: "Kavoon", fontSize: 40,) ,
+   appBarTheme: const AppBarTheme( backgroundColor: Colors.transparent ,),
+    textTheme: const TextTheme(displayLarge:TextStyle(color: Colors.white , fontFamily: "Kavoon", fontSize: 40,) ,
       displaySmall: TextStyle(color: Colors.black , fontSize: 25, fontWeight: FontWeight.bold),
-    )
+    ),
+
+
   );
 }

@@ -5,7 +5,7 @@ class Dashbord extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Dashbord"),),
+      appBar: AppBar(title: Text("Dashbord",style: Theme.of(context).textTheme.displayLarge,),),
     );
   }
 }

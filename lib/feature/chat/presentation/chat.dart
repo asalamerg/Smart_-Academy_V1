@@ -6,7 +6,7 @@ class Chat extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
    return Scaffold(
-     appBar: AppBar(title: Text("chat"),),
+     appBar: AppBar(title: Text("chat" ,style: Theme.of(context).textTheme.displayLarge,),),
    );
   }
 }

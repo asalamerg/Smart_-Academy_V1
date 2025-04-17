@@ -1,18 +1,14 @@
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 import 'package:smart_academy/core/loading/loading.dart';
-import 'package:smart_academy/feature/authentication/data/firebaseFunctionUser.dart';
 import 'package:smart_academy/feature/authentication/presentation/screen_ui/register/register.dart';
 import 'package:smart_academy/feature/authentication/presentation/widget/default_button.dart';
 import 'package:smart_academy/feature/authentication/presentation/widget/textformfield.dart';
 import 'package:smart_academy/feature/authentication/presentation/widget/validation.dart';
 import 'package:smart_academy/feature/authentication/view_model/auth_bloc.dart';
 import 'package:smart_academy/feature/authentication/view_model/auth_status.dart';
-import 'package:loading_indicator/loading_indicator.dart';
 import 'package:smart_academy/feature/home/home.dart';
 
 
@@ -27,7 +23,7 @@ class Login extends StatefulWidget{
 
 class _LoginState extends State<Login> {
   TextEditingController  passwordController =TextEditingController();
-  TextEditingController  EmailController =TextEditingController();
+  TextEditingController  emailController =TextEditingController();
   var formKey=GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -45,7 +41,7 @@ class _LoginState extends State<Login> {
             mainAxisAlignment: MainAxisAlignment.center,
               children: [
 
-                DefaultTextFormField(title: "Email",controller: EmailController, validator: validation.email,),
+                DefaultTextFormField(title: "Email",controller: emailController, validator: validation.email,),
                 DefaultTextFormField(title: "Password",controller: passwordController,validator: validation.password ),
 
 
@@ -60,7 +56,7 @@ class _LoginState extends State<Login> {
                   }
                   else if (state is LoginAuthError){
                       Fluttertoast.showToast(
-                          msg:state.error ?? " error",
+                          msg:state.error ,
                           toastLength: Toast.LENGTH_SHORT,
                           gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 1,
@@ -69,7 +65,7 @@ class _LoginState extends State<Login> {
                           fontSize: 16.0
                       );
                   }
-                }, child: DefaultButton(onPressed: Login,title: "Login",)),
+                }, child: DefaultButton(onPressed: login,title: "Login",)),
 
 
                 const SizedBox(height: 10,),
@@ -84,9 +80,9 @@ class _LoginState extends State<Login> {
       ),
     );
   }
-  void Login(){
+  void login(){
     if (formKey.currentState!.validate()) {
-      BlocProvider.of<AuthBloc>(context).LoginViewModel(email: EmailController.text, password: passwordController.text);
+      BlocProvider.of<AuthBloc>(context).loginViewModel(email: emailController.text, password: passwordController.text);
 
     }
 

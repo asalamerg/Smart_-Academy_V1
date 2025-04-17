@@ -8,12 +8,9 @@ class AuthBloc extends Cubit<AuthStatus>{
   AuthBloc(): super(AuthInitial());
 
   ModelUser? modelUser ;
-  void ChangedUser(ModelUser user){
-    modelUser=user ;
-    emit(AuthChangeUser());
-  }
 
-  Future<void> LoginViewModel({required String email , required String password})async{
+
+  Future<void> loginViewModel({required String email , required String password})async{
   emit(LoginAuthLoading());
   try{
   modelUser=  await  FunctionFirebaseUser.LoginAccount(email, password);
@@ -23,12 +20,9 @@ class AuthBloc extends Cubit<AuthStatus>{
   }catch(e){
 
     emit(LoginAuthError(error: e.toString()));
-  }
+  }}
 
-
-  }
-
-  Future<void> RegistetViewModel({required String name , required String password , required String numberId ,required String email })async{
+  Future<void> registerViewModel({required String name , required String password , required String numberId ,required String email })async{
     emit(RegisterAuthLoading());
     try{
      modelUser=  await FunctionFirebaseUser.RegisterAccount(email, name, numberId, password);

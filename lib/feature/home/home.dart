@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
         image: DecorationImage(image: AssetImage("assets/image/background.png"),fit: BoxFit.fill),
       ),
       child: Scaffold(
-
+         appBar: AppBar(  leading: Container() ,title: Text(item[select].toString() ,style: Theme.of(context).textTheme.displayLarge,),centerTitle: true,),
           body: item[select],
 
         bottomNavigationBar: BottomNavigationBar(

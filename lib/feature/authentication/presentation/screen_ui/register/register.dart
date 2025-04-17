@@ -23,8 +23,8 @@ class Register extends StatefulWidget{
 
 class _RegisterState extends State<Register> {
   TextEditingController  passwordController =TextEditingController();
-  TextEditingController  EmailController =TextEditingController();
-  TextEditingController NameController =TextEditingController();
+  TextEditingController  emailController =TextEditingController();
+  TextEditingController nameController =TextEditingController();
   TextEditingController  idController =TextEditingController();
   var formKey=GlobalKey<FormState>();
   @override
@@ -41,8 +41,8 @@ class _RegisterState extends State<Register> {
             child: Column(
                mainAxisAlignment: MainAxisAlignment.center,
               children: [
-              DefaultTextFormField(title: "Name",controller: NameController,validator: validation.name, ),
-              DefaultTextFormField(title: "Email",controller: EmailController, validator: validation.email,),
+              DefaultTextFormField(title: "Name",controller: nameController,validator: validation.name, ),
+              DefaultTextFormField(title: "Email",controller: emailController, validator: validation.email,),
               DefaultTextFormField(title: "Password",controller: passwordController,validator: validation.password, ),
               DefaultTextFormField(title: "ID",controller: idController, validator: validation.id,),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.10,),
@@ -80,7 +80,7 @@ class _RegisterState extends State<Register> {
   }
   void register(){
     if (formKey.currentState!.validate()) {
-      BlocProvider.of<AuthBloc>(context).RegistetViewModel(name: NameController.text, password: passwordController.text, numberId: idController.text, email: EmailController.text);
+      BlocProvider.of<AuthBloc>(context).registerViewModel(name: nameController.text, password: passwordController.text, numberId: idController.text, email: emailController.text);
 
 
     }

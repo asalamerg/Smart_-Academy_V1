@@ -19,7 +19,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
 
   );
-  runApp(BlocProvider(create:(_)=>AuthBloc(),child:   SmartAcademy()));
+  runApp(BlocProvider(create:(_)=>AuthBloc(),child:   const SmartAcademy()));
 }
 
 class SmartAcademy extends StatelessWidget{
@@ -30,11 +30,11 @@ class SmartAcademy extends StatelessWidget{
 
    return MaterialApp(
      debugShowCheckedModeBanner: false,
-    home: Login(),
+    home: const Login(),
     routes: {
       HomeScreen.routeName :(context)=>const HomeScreen(),
       Login.routeName :(context)=>const Login(),
-      Register.routeName :(context)=>Register(),
+      Register.routeName :(context)=>const Register(),
     },initialRoute: Login.routeName,
      theme: AppTheme.light,
      themeMode: ThemeMode.light,

@@ -11,6 +11,7 @@ class AppTheme{
    appBarTheme: const AppBarTheme( backgroundColor: Colors.transparent ,),
     textTheme: const TextTheme(displayLarge:TextStyle(color: Colors.white , fontFamily: "Kavoon", fontSize: 40,) ,
       displaySmall: TextStyle(color: Colors.black , fontSize: 25, fontWeight: FontWeight.bold),
+      
     ),
 
 

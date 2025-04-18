@@ -37,43 +37,45 @@ class _LoginState extends State<Login> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(backgroundColor: Colors.transparent ,title: Text("Login",style: Theme.of(context).textTheme.displayLarge,),centerTitle: true,),
 
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-
-                DefaultTextFormField(title: "Email",controller: emailController, validator: validation.email,),
-                DefaultTextFormField(title: "Password",controller: passwordController,validator: validation.password ),
-
-
-                 SizedBox(height: MediaQuery.of(context).size.height * 0.20,),
-
-                BlocListener<AuthBloc,AuthStatus>( listener: (_,state){
-                  if(state is LoginAuthLoading){
-                    Loading();
-                  }
-                  else if (state is LoginAuthSuccess){
-                    Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-                  }
-                  else if (state is LoginAuthError){
-                      Fluttertoast.showToast(
-                          msg:state.error ,
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.blue,
-                          textColor: Colors.white,
-                          fontSize: 16.0
-                      );
-                  }
-                }, child: DefaultButton(onPressed: login,title: "Login",)),
-
-
-                const SizedBox(height: 10,),
-
-                InkWell(
-                    onTap: (){Navigator.of(context).pushNamed(Register.routeName);},
-                    child: Text("Create an account",style: Theme.of(context).textTheme.displaySmall,)),
-              ],
+          body: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+            
+                  DefaultTextFormField(title: "Email",controller: emailController, validator: validation.email,),
+                  DefaultTextFormField(title: "Password",controller: passwordController,validator: validation.password ),
+            
+            
+                   SizedBox(height: MediaQuery.of(context).size.height * 0.20,),
+            
+                  BlocListener<AuthBloc,AuthStatus>( listener: (_,state){
+                    if(state is LoginAuthLoading){
+                      Loading();
+                    }
+                    else if (state is LoginAuthSuccess){
+                      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+                    }
+                    else if (state is LoginAuthError){
+                        Fluttertoast.showToast(
+                            msg:state.error ,
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.blue,
+                            textColor: Colors.white,
+                            fontSize: 16.0
+                        );
+                    }
+                  }, child: DefaultButton(onPressed: login,title: "Login",)),
+            
+            
+                  const SizedBox(height: 10,),
+            
+                  InkWell(
+                      onTap: (){Navigator.of(context).pushNamed(Register.routeName);},
+                      child: Text("Create an account",style: Theme.of(context).textTheme.displaySmall,)),
+                ],
+            ),
           ),
 
         ),

@@ -6,6 +6,7 @@ import 'package:smart_academy/feature/authentication/presentation/screen_ui/logi
 
 import 'package:smart_academy/feature/authentication/presentation/screen_ui/register/register.dart';
 import 'package:smart_academy/feature/authentication/view_model/auth_bloc.dart';
+import 'package:smart_academy/feature/chat/presentation/create_room_screen.dart';
 
 import 'package:smart_academy/feature/home/home.dart';
 import 'package:smart_academy/firebase_options.dart';
@@ -35,7 +36,8 @@ class SmartAcademy extends StatelessWidget{
       HomeScreen.routeName :(context)=>const HomeScreen(),
       Login.routeName :(context)=>const Login(),
       Register.routeName :(context)=>const Register(),
-    },initialRoute: Login.routeName,
+      CreateRoomScreen.routeName :(context)=>CreateRoomScreen(),
+    },initialRoute: HomeScreen.routeName,
      theme: AppTheme.light,
      themeMode: ThemeMode.light,
    );

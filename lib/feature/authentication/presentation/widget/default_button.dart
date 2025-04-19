@@ -1,11 +1,10 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DefaultButton extends StatelessWidget{
   void Function()? onPressed ;
   String title;
-  DefaultButton({required this.onPressed ,required this.title});
+  DefaultButton({super.key, required this.onPressed ,required this.title});
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -13,6 +12,6 @@ class DefaultButton extends StatelessWidget{
       fixedSize: Size(MediaQuery.of(context).size.width * 0.80, 55 ),
       backgroundColor: Colors.blue
     ) ,
-        child: Text(title ,style: TextStyle(fontSize: 20 ,color: Colors.white),));
+        child: Text(title ,style: const TextStyle(fontSize: 20 ,color: Colors.white),));
   }
 }

@@ -9,6 +9,7 @@ class ViewModelRoom extends Cubit<StatusRoom>{
   ViewModelRoom():super (RoomInitial());
 
   List<RoomModel> rooms=[];
+
   Future<void> getRoomViewModel()async{
     emit(GetRoomLoading());
     try{
@@ -27,6 +28,20 @@ class ViewModelRoom extends Cubit<StatusRoom>{
     }catch(error){
       emit(CreateRoomError(message: error.toString()));
     }
+  }
+
+  Future<void> deleteRoomViewModel(String roomId)async{
+
+    emit(DeleteRoomLoading());
+    try{
+      await FirebaseRoom.deleteRoomFromFirebase(roomId);
+      rooms.removeWhere((room) => room.id == roomId);
+
+      emit(DeleteRoomSuccess());    }
+    catch(e){
+      emit(DeleteRoomError(message: e.toString()));
+    }
+
   }
 
 }

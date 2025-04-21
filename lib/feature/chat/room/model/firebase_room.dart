@@ -25,4 +25,10 @@ return  querySnapshot.docs.map((docSnapShot)=>docSnapShot.data()).toList();
    return  createId.set(room);
 
   }
+
+  static Future<void> deleteRoomFromFirebase(String roomId)async{
+    CollectionReference getCollection =createCollectionRoom();
+   return  getCollection.doc(roomId).delete();
+
+  }
 }

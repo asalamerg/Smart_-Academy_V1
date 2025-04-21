@@ -34,6 +34,7 @@ class RoomItem extends StatelessWidget {
         ],
       ),
       child: Container(
+        width: MediaQuery.of(context).size.width * 0.45,
         padding: const EdgeInsets.only(left: 20 ,right: 20 ,bottom: 10  ),
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -53,14 +54,14 @@ class RoomItem extends StatelessWidget {
             Text(
               roomModel.name,
               style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black),
+                  fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
             ),
             Text(
               roomModel.description,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w400, color: Colors.blue),
+                  fontSize: 17, fontWeight: FontWeight.w400, color: Colors.blue),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_academy/feature/chat/chat_chat/view/chat_screen.dart';
 import 'package:smart_academy/feature/chat/room/view_model/status_room.dart';
 import 'package:smart_academy/feature/chat/room/view_model/view_model_room.dart';
 import 'package:smart_academy/shared/error/error.dart';
@@ -51,18 +52,23 @@ class _RoomScreenState extends State<RoomScreen> {
               } else if (state is GetRoomError) {
                 return ErrorIndicator(message: state.message);
               } else {
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.8,
-                    mainAxisSpacing: 2,
-                    crossAxisSpacing: 2,
+                return InkWell(
+                  onTap: (){
+                    Navigator.of(context).pushNamed(ChatHome.routeName);
+                  },
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.8,
+                      mainAxisSpacing: 2,
+                      crossAxisSpacing: 2,
+                    ),
+                    itemCount: viewModel.rooms.length,
+                    itemBuilder: (context, index) =>
+                        RoomItem(roomModel: viewModel.rooms[index]),
                   ),
-                  itemCount: viewModel.rooms.length,
-                  itemBuilder: (context, index) =>
-                      RoomItem(roomModel: viewModel.rooms[index]),
                 );
               }
             },

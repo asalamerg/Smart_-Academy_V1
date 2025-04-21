@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_academy/feature/authentication/view/screen_ui/login/login.dart';
 import 'package:smart_academy/feature/authentication/view/screen_ui/register/register.dart';
 import 'package:smart_academy/feature/authentication/view_model/auth_bloc.dart';
+import 'package:smart_academy/feature/chat/chat_chat/view/chat_screen.dart';
 import 'package:smart_academy/feature/chat/chat_screen_home.dart';
 import 'package:smart_academy/feature/chat/room/view/create_room_screen.dart';
 import 'package:smart_academy/feature/chat/room/view_model/view_model_room.dart';
@@ -46,7 +47,7 @@ class SmartAcademy extends StatelessWidget{
       Register.routeName :(context)=>const Register(),
       CreateRoomScreen.routeName :(context)=>const CreateRoomScreen(),
       Chat.routeName :(context)=>const  Chat(),
-
+      ChatHome.routeName :(context)=>ChatHome()
 
     },initialRoute: HomeScreen.routeName,
      theme: AppTheme.light,

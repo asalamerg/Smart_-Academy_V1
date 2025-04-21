@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:smart_academy/core/theme/apptheme.dart';
-import 'package:smart_academy/feature/Notifications/presentation/notifications.dart';
-import 'package:smart_academy/feature/chat/presentation/chat_screen_home.dart';
-import 'package:smart_academy/feature/dashbord/presentation/dashbord.dart';
-import 'package:smart_academy/feature/person/presentation/person.dart';
+import 'package:smart_academy/feature/Notifications/view/notifications.dart';
+import 'package:smart_academy/feature/chat/chat_screen_home.dart';
+import 'package:smart_academy/feature/dashbord/view/dashbord.dart';
+import 'package:smart_academy/feature/person/view/person.dart';
+import 'package:smart_academy/shared/theme/apptheme.dart';
 
 class HomeScreen extends StatefulWidget{
 static const  String routeName="home";
@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     List<Widget> item=[
       Dashbord(),
-      Chat(),
+      const Chat(),
       Notifications(),
       Person(),
     ];

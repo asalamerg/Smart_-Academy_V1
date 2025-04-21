@@ -1,7 +1,8 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:smart_academy/feature/authentication/data/firebaseFunctionUser.dart';
-import 'package:smart_academy/feature/authentication/data/model_user.dart';
+import 'package:smart_academy/feature/authentication/model/firebaseFunctionUser.dart';
+import 'package:smart_academy/feature/authentication/model/model_user.dart';
+
 import 'package:smart_academy/feature/authentication/view_model/auth_status.dart';
 
 class AuthBloc extends Cubit<AuthStatus>{

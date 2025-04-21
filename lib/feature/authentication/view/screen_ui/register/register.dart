@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:smart_academy/core/loading/loading.dart';
-import 'package:smart_academy/feature/authentication/presentation/widget/default_button.dart';
-import 'package:smart_academy/feature/authentication/presentation/widget/textformfield.dart';
-import 'package:smart_academy/feature/authentication/presentation/widget/validation.dart';
+
 import 'package:smart_academy/feature/authentication/view_model/auth_bloc.dart';
 import 'package:smart_academy/feature/authentication/view_model/auth_status.dart';
 
-import 'package:smart_academy/feature/home/home.dart';
+import 'package:smart_academy/feature/home/view/home.dart';
+import 'package:smart_academy/shared/loading/loading.dart';
+import 'package:smart_academy/shared/widget/default_button.dart';
+import 'package:smart_academy/shared/widget/textformfield.dart';
+import 'package:smart_academy/shared/widget/validation.dart';
 
 
 

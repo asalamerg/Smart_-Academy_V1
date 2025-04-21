@@ -1,15 +1,18 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:smart_academy/core/theme/apptheme.dart';
-import 'package:smart_academy/feature/authentication/presentation/screen_ui/login/login.dart';
-
-import 'package:smart_academy/feature/authentication/presentation/screen_ui/register/register.dart';
+import 'package:smart_academy/feature/authentication/view/screen_ui/login/login.dart';
+import 'package:smart_academy/feature/authentication/view/screen_ui/register/register.dart';
 import 'package:smart_academy/feature/authentication/view_model/auth_bloc.dart';
-import 'package:smart_academy/feature/chat/presentation/create_room_screen.dart';
+import 'package:smart_academy/feature/chat/chat_screen_home.dart';
+import 'package:smart_academy/feature/chat/room/view/create_room_screen.dart';
+import 'package:smart_academy/feature/chat/room/view_model/view_model_room.dart';
 
-import 'package:smart_academy/feature/home/home.dart';
+import 'package:smart_academy/feature/home/view/home.dart';
 import 'package:smart_academy/firebase_options.dart';
+import 'package:smart_academy/shared/bloc_observer.dart';
+
+import 'shared/theme/apptheme.dart';
 
 
 Future<void> main() async {
@@ -20,7 +23,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
 
   );
-  runApp(BlocProvider(create:(_)=>AuthBloc(),child:   const SmartAcademy()));
+  Bloc.observer=AppBlocObserver();
+  runApp( MultiBlocProvider( providers: [
+    BlocProvider(create: (_)=>AuthBloc()), 
+    BlocProvider(create: (_)=>ViewModelRoom())
+  ]
+      ,child:   const SmartAcademy()));
 }
 
 class SmartAcademy extends StatelessWidget{
@@ -36,7 +44,10 @@ class SmartAcademy extends StatelessWidget{
       HomeScreen.routeName :(context)=>const HomeScreen(),
       Login.routeName :(context)=>const Login(),
       Register.routeName :(context)=>const Register(),
-      CreateRoomScreen.routeName :(context)=>CreateRoomScreen(),
+      CreateRoomScreen.routeName :(context)=>const CreateRoomScreen(),
+      Chat.routeName :(context)=>const  Chat(),
+
+
     },initialRoute: HomeScreen.routeName,
      theme: AppTheme.light,
      themeMode: ThemeMode.light,

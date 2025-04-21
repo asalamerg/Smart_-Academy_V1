@@ -1,7 +1,7 @@
 
  import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:smart_academy/feature/authentication/data/model_user.dart';
+import 'package:smart_academy/feature/authentication/model/model_user.dart';
 
 class  FunctionFirebaseUser {
 

@@ -10,6 +10,14 @@ class validation{
     }
     return null;
   }
+  static String? description(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'الوصف  مطلوب';
+    } else if (value.length < 3) {
+      return 'يجب أن يكون الوصف  أكثر من 3 أحرف';
+    }
+    return null;
+  }
 
   static String? id(String? value) {
     if (value == null || value.trim().isEmpty) {

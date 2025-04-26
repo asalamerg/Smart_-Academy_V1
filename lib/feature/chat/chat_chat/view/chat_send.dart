@@ -1,23 +1,25 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_academy/feature/chat/chat_chat/model/message_model.dart';
 
 class ChatSent extends StatelessWidget{
-   ChatSent({super.key});
+  final MessageModel messageModel ;
+   const  ChatSent({super.key ,required this.messageModel});
 
 
- final String formattedTime = DateFormat.jm().format(DateTime.now());
   @override
   Widget build(BuildContext context) {
 
 
     return Row(
        crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
 
-            child: Text(formattedTime ,style: const TextStyle(fontSize: 15 ,fontWeight:FontWeight.w400 ),)),
+            child:  Text(DateFormat.jm().format(messageModel.dateTime)  ,style: const TextStyle(fontSize: 15 ,fontWeight:FontWeight.w400 ),)),
 
        Flexible(
          child: Container(
@@ -29,7 +31,7 @@ class ChatSent extends StatelessWidget{
                borderRadius: BorderRadius.only(topLeft: Radius.circular(10) , topRight: Radius.circular(10) ,bottomRight: Radius.circular(0), bottomLeft: Radius.circular(10) ) ,
              ),
          
-             child: const Text(" Sent Message " ,style: TextStyle(fontSize: 20  , fontWeight: FontWeight.w400),)),
+             child:  Text(messageModel.content ,style: const TextStyle(fontSize: 20  , fontWeight: FontWeight.w400),)),
        ),
 
       //SizedBox(width: MediaQuery.of(context).size.width * 0.30,),

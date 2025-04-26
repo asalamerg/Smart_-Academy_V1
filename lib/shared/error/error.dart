@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 class ErrorIndicator extends StatelessWidget{
-  String message ;
-  ErrorIndicator({super.key , required this.message});
+final  String message ;
+  const ErrorIndicator({super.key ,  this.message ="يوجد خطا ما !"});
 
 
 

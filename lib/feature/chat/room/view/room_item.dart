@@ -45,23 +45,11 @@ class RoomItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              "assets/image/chat.png",
-              height: MediaQuery.of(context).size.height * 0.15,
-              width: MediaQuery.of(context).size.width * 0.25,
-              fit: BoxFit.fill,
-            ),
-            Text(
-              roomModel.name,
-              style: const TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
-            ),
-            Text(
-              roomModel.description,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  fontSize: 17, fontWeight: FontWeight.w400, color: Colors.blue),
+            Image.asset("assets/image/chat.png",
+              height: MediaQuery.of(context).size.height * 0.15, width: MediaQuery.of(context).size.width * 0.25, fit: BoxFit.fill,),
+            Text(roomModel.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),),
+            Text(roomModel.description, maxLines: 3, overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w400, color: Colors.blue),
             ),
           ],
         ),

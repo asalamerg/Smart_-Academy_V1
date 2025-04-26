@@ -9,13 +9,16 @@ static  CollectionReference<RoomModel>  createCollectionRoom()=>FirebaseFirestor
       fromFirestore: (docSnapShot,_)=>RoomModel.fromJson(docSnapShot.data()!),
       toFirestore: (model,_)=>model.toJson() );
 
-static  Future<List<RoomModel>> getRoomFromFirebase()async{
+
+
+  static  Future<List<RoomModel>> getRoomFromFirebase()async{
      CollectionReference<RoomModel> getRoom=createCollectionRoom();
 QuerySnapshot<RoomModel> querySnapshot= await getRoom.get();
 
 return  querySnapshot.docs.map((docSnapShot)=>docSnapShot.data()).toList();
 
   }
+
 
   static Future<void> createRoomFromFirebase (RoomModel room )async{
     CollectionReference createRooms =createCollectionRoom();
@@ -25,6 +28,7 @@ return  querySnapshot.docs.map((docSnapShot)=>docSnapShot.data()).toList();
    return  createId.set(room);
 
   }
+
 
   static Future<void> deleteRoomFromFirebase(String roomId)async{
     CollectionReference getCollection =createCollectionRoom();

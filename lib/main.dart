@@ -5,6 +5,7 @@ import 'package:smart_academy/feature/authentication/view/screen_ui/login/login.
 import 'package:smart_academy/feature/authentication/view/screen_ui/register/register.dart';
 import 'package:smart_academy/feature/authentication/view_model/auth_bloc.dart';
 import 'package:smart_academy/feature/chat/chat_chat/view/chat_screen.dart';
+import 'package:smart_academy/feature/chat/chat_chat/view_model/chat_view_model.dart';
 import 'package:smart_academy/feature/chat/chat_screen_home.dart';
 import 'package:smart_academy/feature/chat/room/view/create_room_screen.dart';
 import 'package:smart_academy/feature/chat/room/view_model/view_model_room.dart';
@@ -27,7 +28,8 @@ Future<void> main() async {
   Bloc.observer=AppBlocObserver();
   runApp( MultiBlocProvider( providers: [
     BlocProvider(create: (_)=>AuthBloc()), 
-    BlocProvider(create: (_)=>ViewModelRoom())
+    BlocProvider(create: (_)=>ViewModelRoom()),
+    BlocProvider(create: (_)=>ChatViewModel())
   ]
       ,child:   const SmartAcademy()));
 }
@@ -47,9 +49,9 @@ class SmartAcademy extends StatelessWidget{
       Register.routeName :(context)=>const Register(),
       CreateRoomScreen.routeName :(context)=>const CreateRoomScreen(),
       Chat.routeName :(context)=>const  Chat(),
-      ChatHome.routeName :(context)=>ChatHome()
+      ChatHome.routeName :(context)=>const ChatHome()
 
-    },initialRoute: HomeScreen.routeName,
+    },initialRoute: Login.routeName,
      theme: AppTheme.light,
      themeMode: ThemeMode.light,
    );

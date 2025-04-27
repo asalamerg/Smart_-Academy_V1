@@ -10,7 +10,8 @@ class AppTheme{
    scaffoldBackgroundColor: Colors.transparent,
    appBarTheme: const AppBarTheme( backgroundColor: Colors.transparent ,),
     textTheme: const TextTheme(displayLarge:TextStyle(color: Colors.white , fontFamily: "Kavoon", fontSize: 40,) ,
-      displaySmall: TextStyle(color: Colors.black , fontSize: 25, fontWeight: FontWeight.bold),
+
+      displaySmall: TextStyle(color: Colors.black , fontSize: 18, fontWeight: FontWeight.bold),
       
     ),
 

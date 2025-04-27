@@ -51,7 +51,7 @@ class SmartAcademy extends StatelessWidget{
       Chat.routeName :(context)=>const  Chat(),
       ChatHome.routeName :(context)=>const ChatHome()
 
-    },initialRoute: Login.routeName,
+    },initialRoute: HomeScreen.routeName,
      theme: AppTheme.light,
      themeMode: ThemeMode.light,
    );

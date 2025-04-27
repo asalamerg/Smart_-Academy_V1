@@ -21,12 +21,12 @@ class _PersonState extends State<Person> {
 
       body: Container(
 
-        padding: EdgeInsets.all(10),
-        margin: EdgeInsets.all(13),
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(13),
 
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20)) ,
+          borderRadius: const BorderRadius.all(Radius.circular(20)) ,
           border: Border.all(width: 2,color: Colors.blue)
         ),
         child: Column(
@@ -38,7 +38,7 @@ class _PersonState extends State<Person> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [Text("Name",style:displaySmall ) ,Text(user!.name ,style:displaySmall?.copyWith(fontSize: 25))],) ,
-            SizedBox(height: 30,),
+            const SizedBox(height: 30,),
             Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [Text("Id",style:displaySmall) , Text(user.numberId,style:displaySmall?.copyWith(fontSize: 25))],) ,
@@ -46,7 +46,7 @@ class _PersonState extends State<Person> {
               onTap: logout,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [Text("Logout",style:displaySmall) ,     SizedBox(width: 30,),const Icon(Icons.logout ,size: 35 ,color: Colors.blue ,)],))
+                children: [Text("Logout",style:displaySmall) ,     const SizedBox(width: 30,),const Icon(Icons.logout ,size: 35 ,color: Colors.blue ,)],))
         ],),
       ),
     );

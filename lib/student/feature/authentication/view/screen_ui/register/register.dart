@@ -87,34 +87,3 @@ class _RegisterState extends State<Register> {
     }
   }
 }
-//       FunctionFirebaseUser.RegisterAccount(
-//           EmailController.text,
-//           NameController.text,
-//           idController.text,
-//           passwordController.text).
-//       then((user){
-//         Provider.of<UserProvider>(context ,listen: false).UpdateUser(user);
-//         Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-//       }).
-//       catchError((error){
-//         String ? messages ;
-//         if(error is FirebaseAuthException){
-//           messages =error.message;
-//         }
-//         Fluttertoast.showToast(
-//             msg: messages ??  "error",
-//             toastLength: Toast.LENGTH_SHORT,
-//             gravity: ToastGravity.BOTTOM,
-//             timeInSecForIosWeb: 1,
-//             backgroundColor: Colors.blue,
-//             textColor: Colors.white,
-//             fontSize: 16.0
-//         );
-//       });
-//
-//
-//     }
-//
-//   }
-//
-// }

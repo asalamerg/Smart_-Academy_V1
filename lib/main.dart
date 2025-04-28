@@ -1,13 +1,20 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_academy/admin/feature_admin/authentication_admin/view/login_admin.dart';
+import 'package:smart_academy/admin/feature_admin/authentication_admin/view/register_admin.dart';
+import 'package:smart_academy/admin/feature_admin/authentication_admin/view_model/auth_bloc_admin.dart';
+import 'package:smart_academy/admin/feature_admin/screen_home_admin/view/screen_home_admin.dart';
 
 import 'package:smart_academy/firebase_options.dart';
 import 'package:smart_academy/shared/bloc_observer.dart';
 import 'package:smart_academy/student/feature/chat/room/view/room_screen.dart';
+import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_bloc_teacher.dart';
 
-import 'parent/feature_parent/authentication_parent/login_parent.dart';
-import 'parent/feature_parent/authentication_parent/register_parent.dart';
+import 'parent/feature_parent/authentication_parent/view/login_parent.dart';
+import 'parent/feature_parent/authentication_parent/view/register_parent.dart';
+import 'parent/feature_parent/authentication_parent/view_model/bloc_auth_parent.dart';
+import 'parent/feature_parent/screen_home_parent/view/screen_home_parent.dart';
 import 'shared/widget/select _category.dart';
 import 'shared/theme/apptheme.dart';
 import 'student/feature/authentication/view/screen_ui/login/login.dart';
@@ -20,6 +27,7 @@ import 'student/feature/chat/room/view_model/view_model_room.dart';
 import 'student/feature/home/view/home.dart';
 import 'teacher/feature_teacher/authentication_teacher/view/login_teacher.dart';
 import 'teacher/feature_teacher/authentication_teacher/view/register_teacher.dart';
+import 'teacher/feature_teacher/screen_home_teacher/view/screen_home_teacher.dart';
 
 
 Future<void> main() async {
@@ -34,7 +42,10 @@ Future<void> main() async {
   runApp( MultiBlocProvider( providers: [
     BlocProvider(create: (_)=>AuthBloc()), 
     BlocProvider(create: (_)=>ViewModelRoom()),
-    BlocProvider(create: (_)=>ChatViewModel())
+    BlocProvider(create: (_)=>ChatViewModel()),
+    BlocProvider(create: (_)=>AuthBlocTeacher()),
+    BlocProvider(create: (_)=>AuthBlocAdmin()),
+    BlocProvider(create: (_)=>AuthBlocParent()),
   ]
       ,child:   const SmartAcademy()));
 }
@@ -60,7 +71,11 @@ class SmartAcademy extends StatelessWidget{
       LoginParent.routeName :(context)=>const LoginParent(),
       RegisterParent.routeName :(context)=>const RegisterParent(),
       RegisterTeacher.routeName :(context)=>const RegisterTeacher(),
-
+      LoginAdmin.routeName :(context)=>const LoginAdmin(),
+      RegisterAdmin.routeName :(context)=>const RegisterAdmin(),
+      HomeScreenTeacher.routeName :(context)=>HomeScreenTeacher(),
+      ScreenHomeAdmin .routeName :(context)=>const ScreenHomeAdmin(),
+      ScreenHomeParent.routeName :(context)=> const ScreenHomeParent()
     },initialRoute: SelectCategory.routeName,
 
      theme: AppTheme.light,

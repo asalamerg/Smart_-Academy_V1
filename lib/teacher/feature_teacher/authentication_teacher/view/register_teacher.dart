@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:smart_academy/shared/loading/loading.dart';
 
 import 'package:smart_academy/shared/widget/default_button.dart';
 import 'package:smart_academy/shared/widget/textformfield.dart';
 import 'package:smart_academy/shared/widget/validation.dart';
+import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_bloc_teacher.dart';
+import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_teacher_state.dart';
+import 'package:smart_academy/teacher/feature_teacher/screen_home_teacher/view/screen_home_teacher.dart';
 
 
 
@@ -44,52 +50,43 @@ class _RegisterState extends State<RegisterTeacher> {
 
 
 
-                 DefaultButton(onPressed: (){},title: "Register",)
+
+
+            BlocListener<AuthBlocTeacher,AuthStatusTeacher>(  listener: (_,state){
+              if(state is RegisterAuthLoadingTeacher){
+                const Loading();
+              }
+              else if(state is RegisterAuthSuccessTeacher){
+                Navigator.of(context).pushReplacementNamed(HomeScreenTeacher.routeName ,);
+
+              }
+              else if(state is RegisterAuthErrorTeacher){
+                Fluttertoast.showToast(
+                    msg: state.error ,
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.blue,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                );
+              }
+            },child:  DefaultButton(onPressed: registerTeacher,title: "Register",)
 
 
 
-              ],),
+            ) ],),
           ),
         ),
       ),
     );
   }
-  // void register(){
-  //   if (formKey.currentState!.validate()) {
-  //     BlocProvider.of<AuthBloc>(context).registerViewModel(name: nameController.text, password: passwordController.text, numberId: idController.text, email: emailController.text);
-  //
-  //
-  //   }
-  // }
+  void registerTeacher(){
+  BlocProvider.of<AuthBlocTeacher>(context).registerViewModelTeacher(
+      name: nameController.text,
+      password: passwordController.text,
+      numberId: idController.text,
+      email: emailController.text);
+  }
+
 }
-//       FunctionFirebaseUser.RegisterAccount(
-//           EmailController.text,
-//           NameController.text,
-//           idController.text,
-//           passwordController.text).
-//       then((user){
-//         Provider.of<UserProvider>(context ,listen: false).UpdateUser(user);
-//         Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-//       }).
-//       catchError((error){
-//         String ? messages ;
-//         if(error is FirebaseAuthException){
-//           messages =error.message;
-//         }
-//         Fluttertoast.showToast(
-//             msg: messages ??  "error",
-//             toastLength: Toast.LENGTH_SHORT,
-//             gravity: ToastGravity.BOTTOM,
-//             timeInSecForIosWeb: 1,
-//             backgroundColor: Colors.blue,
-//             textColor: Colors.white,
-//             fontSize: 16.0
-//         );
-//       });
-//
-//
-//     }
-//
-//   }
-//
-// }

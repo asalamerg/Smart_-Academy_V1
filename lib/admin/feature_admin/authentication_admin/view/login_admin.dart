@@ -4,26 +4,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:smart_academy/admin/feature_admin/authentication_admin/view_model/auth_admin_state.dart';
+import 'package:smart_academy/admin/feature_admin/authentication_admin/view_model/auth_bloc_admin.dart';
+import 'package:smart_academy/admin/feature_admin/screen_home_admin/view/screen_home_admin.dart';
 import 'package:smart_academy/shared/loading/loading.dart';
 import 'package:smart_academy/shared/widget/default_button.dart';
 import 'package:smart_academy/shared/widget/textformfield.dart';
 import 'package:smart_academy/shared/widget/validation.dart';
-import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_bloc_teacher.dart';
-import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_teacher_state.dart';
-import 'package:smart_academy/teacher/feature_teacher/screen_home_teacher/view/screen_home_teacher.dart';
 
-import 'register_teacher.dart';
+import 'register_admin.dart';
 
-class LoginTeacher extends StatefulWidget{
-  static const  String routeName="LoginTeacher";
 
-  const LoginTeacher({super.key});
+
+class LoginAdmin extends StatefulWidget{
+  static const  String routeName="LoginAdmin";
+
+  const LoginAdmin({super.key});
 
   @override
-  State<LoginTeacher> createState() => _LoginState();
+  State<LoginAdmin> createState() => _LoginState();
 }
 
-class _LoginState extends State<LoginTeacher> {
+class _LoginState extends State<LoginAdmin> {
   TextEditingController  passwordController =TextEditingController();
   TextEditingController  emailController =TextEditingController();
   var formKey=GlobalKey<FormState>();
@@ -52,18 +54,20 @@ class _LoginState extends State<LoginTeacher> {
 
 
                 InkWell(
-                    onTap: (){Navigator.of(context).pushNamed(RegisterTeacher.routeName);},
+                    onTap: (){Navigator.of(context).pushNamed(RegisterAdmin.routeName);},
                     child: Text("Create an account",style: Theme.of(context).textTheme.displaySmall,)),
 
                 const SizedBox(height:30),
-            BlocListener<AuthBlocTeacher,AuthStatusTeacher>( listener: (_,state){
-              if(state is LoginAuthLoadingTeacher){
+
+
+            BlocListener<AuthBlocAdmin,AuthStatusAdmin>( listener: (_,state){
+              if(state is LoginAuthLoadingAdmin){
                 const Loading();
               }
-              else if (state is LoginAuthSuccessTeacher){
-                Navigator.of(context).pushReplacementNamed(HomeScreenTeacher.routeName);
+              else if (state is LoginAuthSuccessAdmin){
+                Navigator.of(context).pushReplacementNamed(ScreenHomeAdmin.routeName);
               }
-              else if (state is LoginAuthErrorTeacher){
+              else if (state is LoginAuthErrorAdmin){
                 Fluttertoast.showToast(
                     msg:state.error ,
                     toastLength: Toast.LENGTH_SHORT,
@@ -74,13 +78,12 @@ class _LoginState extends State<LoginTeacher> {
                     fontSize: 16.0
                 );
               }
-            }, child: DefaultButton(onPressed: loginTeacher ,title: "Login",),
+            }, child:DefaultButton(onPressed: loginAdmin,title: "Login",),
+
+            )
 
 
-
-
-
-            ) ],
+              ],
             ),
           ),
 
@@ -88,14 +91,17 @@ class _LoginState extends State<LoginTeacher> {
       ),
     );
   }
-  void loginTeacher(){
-    if (formKey.currentState!.validate()) {
-      BlocProvider.of<AuthBlocTeacher>(context).loginViewModelTeacher(email: emailController.text, password: passwordController.text);
-    }
-  }
+  void loginAdmin(){
+  if (formKey.currentState!.validate()) {
+    BlocProvider.of<AuthBlocAdmin>(context).loginViewModelAdmin(email: emailController.text, password: passwordController.text);
 
 
   }
+
+  }
+
+
+}
 
 
 

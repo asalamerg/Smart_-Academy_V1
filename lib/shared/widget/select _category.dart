@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:smart_academy/parent/feature_parent/authentication_parent/login_parent.dart';
+import 'package:smart_academy/parent/feature_parent/authentication_parent/view/login_parent.dart';
 import 'package:smart_academy/student/feature/authentication/view/screen_ui/login/login.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view/login_teacher.dart';
 
@@ -48,6 +48,12 @@ class SelectCategory extends StatelessWidget{
                   Navigator.of(context).pushNamed(LoginParent.routeName);
                 },
                 child: const Text("Parent",style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold ))),
+              const SizedBox(height:30 ,),
+              InkWell(
+                  onTap: (){
+                    Navigator.of(context).pushNamed(Login.routeName);
+                  },
+                  child: const Text("Admin ",style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold ,color: Colors.blue))),
           ],),
         ),
       ),

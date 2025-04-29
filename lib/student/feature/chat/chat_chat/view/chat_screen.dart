@@ -48,9 +48,7 @@ class _ChatHomeState extends State<ChatHome> {
       throw Exception("البيانات المرسلة ليست من نوع RoomModel");
     }
 
-    userModel = BlocProvider
-        .of<AuthBloc>(context)
-        .modelUser!;
+    userModel = BlocProvider.of<AuthBloc>(context).modelUser!;
   }
 
   @override
@@ -183,10 +181,6 @@ class _ChatHomeState extends State<ChatHome> {
 
 
 }
-
-
-
-
 
 
 

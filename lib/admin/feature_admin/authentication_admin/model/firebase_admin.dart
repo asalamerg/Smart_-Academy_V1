@@ -36,4 +36,5 @@ class  FunctionFirebaseAdmin {
   static Future<void> logoutAdmin()=>FirebaseAuth.instance.signOut();
 
 
+
 }

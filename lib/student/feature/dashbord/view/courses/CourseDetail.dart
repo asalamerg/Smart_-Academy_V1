@@ -215,9 +215,59 @@ class CourseDetailScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _enrollStudent(BuildContext context, String courseId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final studentId = user.uid;
+
+      final studentCourseDoc = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(studentId)
+          .collection('courses')
+          .doc(courseId)
+          .get();
+
+      if (studentCourseDoc.exists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('You are already enrolled in this course.')),
+        );
+        return;
+      }
+
+      await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(courseId)
+          .update({
+        'students': FieldValue.arrayUnion([studentId]),
+      });
+
+      final studentCoursesRef = FirebaseFirestore.instance
+          .collection('user')
+          .doc(studentId)
+          .collection('courses')
+          .doc(courseId);
+
+      await studentCoursesRef.set({
+        'enrolledAt': FieldValue.serverTimestamp(),
+        'attendanceDays': [],
+        'Marks': [],
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('You have successfully enrolled in the course!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to enroll in the course.')),
+      );
+    }
+  }
+
   // Enroll student in the course
   // Enroll student in the course and add course code to student's record
-  Future<void> _enrollStudent(BuildContext context, String courseId) async {
+  Future<void> _enrollStudent1(BuildContext context, String courseId) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final studentId = user.uid;
@@ -231,20 +281,21 @@ class CourseDetailScreen extends StatelessWidget {
       });
 
       // Now, add the course code to the student's courses list in Firestore
-      final courseSnapshot = await FirebaseFirestore.instance
-          .collection('courses')
-          .doc(courseId)
-          .get();
-      final courseData = courseSnapshot.data() as Map<String, dynamic>;
-      final courseCode = courseData['courseCode'] ?? 'No Code';
+      // final courseSnapshot = await FirebaseFirestore.instance
+      //     .collection('courses')
+      //     .doc(courseId)
+      //     .get();
+      // final courseData = courseSnapshot.data() as Map<String, dynamic>;
+      // final courseCode = courseData['courseCode'] ?? 'No Code';
 
       // Add courseCode to the student's courses list in Firestore
+
       await FirebaseFirestore.instance
           .collection('user')
           .doc(studentId)
           .update({
         'courses': FieldValue.arrayUnion(
-            [courseCode]), // Add courseCode to the student's courses list
+            [courseId]), // Add courseCode to the student's courses list
       });
 
       ScaffoldMessenger.of(context).showSnackBar(

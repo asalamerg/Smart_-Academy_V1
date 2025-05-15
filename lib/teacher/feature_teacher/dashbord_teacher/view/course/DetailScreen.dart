@@ -114,6 +114,24 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     }
   }
 
+  Future<List<Map<String, dynamic>>> fetchStudentNames(
+      List<dynamic> studentIds) async {
+    List<Map<String, dynamic>> studentsData = [];
+    for (String id in studentIds) {
+      final doc =
+          await FirebaseFirestore.instance.collection('user').doc(id).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        studentsData.add({
+          'id': id,
+          'name': data['name'] ?? 'No Name',
+          // يمكنك إضافة حقول إضافية هنا إذا أردت
+        });
+      }
+    }
+    return studentsData;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -122,14 +140,17 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final blueColor = Colors.blue.shade700;
+    final lightBlue = Colors.blue.shade50;
+
     return Scaffold(
-      backgroundColor: Colors.white, // Set white background here
+      backgroundColor: Colors.white, // خلفية بيضاء مريحة للعين
       appBar: AppBar(
         title: const Text("Course Details",
             style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.blue, // Keep app bar color
+        backgroundColor: blueColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: FutureBuilder<DocumentSnapshot>(
@@ -157,46 +178,51 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           final endTime = courseData['endTime'] ?? 'Not specified';
           final courseDays = List<String>.from(courseData['days'] ?? []);
           final students = List<String>.from(courseData['students'] ?? []);
-          final canEnroll =
-              courseData['canEnroll'] ?? false; // Check canEnroll status
+          final canEnroll = courseData['canEnroll'] ?? false;
+          final studentsIds = List<dynamic>.from(courseData['students'] ?? []);
+          final studentNamesFuture = fetchStudentNames(studentsIds);
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Course Header
+                // عنوان الكورس مع خلفية مميزة
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.blue[100]!, width: 1),
+                    color: lightBlue,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: blueColor.withOpacity(0.3)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: blueColor.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.school,
-                        size: 40,
-                        color: Colors.blue[700],
-                      ),
-                      const SizedBox(width: 16),
+                      Icon(Icons.school, size: 48, color: blueColor),
+                      const SizedBox(width: 20),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              courseName,
-                              style: const TextStyle(
-                                  fontSize: 20,
+                            Text(courseName,
+                                style: TextStyle(
+                                  fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blue),
-                            ),
-                            const SizedBox(height: 4),
+                                  color: blueColor,
+                                )),
+                            const SizedBox(height: 6),
                             Text(
                               'Course Code: $courseCode',
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.black54),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: blueColor.withOpacity(0.8),
+                              ),
                             ),
                           ],
                         ),
@@ -204,56 +230,56 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
 
-                // Course Information
-                const Text('Course Information',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                const Divider(color: Colors.black12),
+                const SizedBox(height: 30),
+
+                // معلومات الكورس
+                Text('Course Information',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: blueColor,
+                    )),
+                const SizedBox(height: 12),
+                Divider(color: blueColor.withOpacity(0.2)),
                 const SizedBox(height: 12),
 
-                _buildDetailCard(
-                    title: 'Description',
-                    content: courseDescription,
-                    icon: Icons.description),
+                _buildDetailCard('Description', courseDescription,
+                    Icons.description, blueColor, lightBlue),
                 const SizedBox(height: 16),
 
                 Row(
                   children: [
                     Expanded(
-                      child: _buildDetailCard(
-                          title: 'Start Time',
-                          content: startTime,
-                          icon: Icons.access_time),
+                      child: _buildDetailCard('Start Time', startTime,
+                          Icons.access_time, blueColor, lightBlue),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: _buildDetailCard(
-                          title: 'End Time',
-                          content: endTime,
-                          icon: Icons.access_time),
+                      child: _buildDetailCard('End Time', endTime,
+                          Icons.access_time, blueColor, lightBlue),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
 
                 _buildDetailCard(
-                  title: 'Days',
-                  content: courseDays.isEmpty
-                      ? 'No days specified'
-                      : courseDays.join(", "),
-                  icon: Icons.calendar_today,
-                ),
-
+                    'Days',
+                    courseDays.isEmpty
+                        ? 'No days specified'
+                        : courseDays.join(", "),
+                    Icons.calendar_today,
+                    blueColor,
+                    lightBlue),
                 const SizedBox(height: 24),
 
-                // Toggle canEnroll
+                // زر التبديل canEnroll
                 ElevatedButton.icon(
                   onPressed: () => _toggleCanEnroll(canEnroll),
-                  icon: Icon(canEnroll ? Icons.block : Icons.check_circle,
-                      color: Colors.white),
+                  icon: Icon(
+                    canEnroll ? Icons.block : Icons.check_circle,
+                    color: Colors.white,
+                  ),
                   label: Text(
                       canEnroll ? 'Disable Enrollment' : 'Enable Enrollment'),
                   style: ElevatedButton.styleFrom(
@@ -264,9 +290,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                         borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-                // PDF Upload Section
+                // زر رفع ملفات PDF
                 ElevatedButton.icon(
                   onPressed: _pickAndUploadPDF,
                   icon: const Icon(Icons.upload_file),
@@ -279,8 +305,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                         borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
+                // عرض ملفات PDF المرفوعة
                 if (pdfUrls.isEmpty)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
@@ -310,15 +337,17 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                         ),
                     ],
                   ),
+                const SizedBox(height: 30),
 
-                const SizedBox(height: 24),
-
-                // Enrolled Students
-                const Text('Enrolled Students',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                const Divider(color: Colors.black12),
+                // قائمة الطلاب المسجلين
+                Text('Enrolled Students',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: blueColor,
+                    )),
+                const SizedBox(height: 12),
+                Divider(color: blueColor.withOpacity(0.2)),
                 const SizedBox(height: 12),
 
                 if (students.isEmpty)
@@ -333,34 +362,50 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     ),
                   )
                 else
-                  Column(
-                    children: [
-                      for (var student in students)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: ListTile(
-                            leading: const CircleAvatar(
-                              backgroundColor: Colors.blue,
-                              child: Icon(Icons.person, color: Colors.white),
-                            ),
-                            title: Text(student),
-                            tileColor: Colors.grey,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: studentNamesFuture,
+                    builder: (context, studentSnapshot) {
+                      if (studentSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (studentSnapshot.hasError) {
+                        return Text(
+                            'Error loading students: ${studentSnapshot.error}');
+                      }
+                      final studentsList = studentSnapshot.data ?? [];
+                      return Container(
+                        constraints: const BoxConstraints(maxHeight: 250),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                    ],
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: studentsList.length,
+                          itemBuilder: (context, index) {
+                            var student = studentsList[index];
+                            return ListTile(
+                              leading: const CircleAvatar(
+                                backgroundColor: Colors.blue,
+                                child: Icon(Icons.person, color: Colors.white),
+                              ),
+                              title: Text(student['name']),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 30),
 
-                // Action Buttons
+                // أزرار التعديل والحذف
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () async {
-                          // Navigate to Edit Course screen directly
                           final updated = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
@@ -369,7 +414,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                             ),
                           );
 
-                          // If the screen was popped with true, refresh the data
                           if (updated == true) {
                             setState(() {
                               courseDetails = _fetchCourseDetails();
@@ -379,10 +423,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                         icon: const Icon(Icons.edit),
                         label: const Text('Edit Course'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Colors.blue, // Blue background for Edit button
-                          foregroundColor:
-                              Colors.white, // White text color for Edit button
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
@@ -393,7 +435,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () async {
-                          // Show confirmation dialog before deleting the course
                           final confirmDelete = await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -415,29 +456,23 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                           );
 
                           if (confirmDelete == true) {
-                            // Delete the course from Firestore
                             await FirebaseFirestore.instance
                                 .collection('courses')
                                 .doc(widget.courseId)
                                 .delete();
 
-                            // Show a success message and navigate back
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text('Course deleted successfully')),
                             );
-                            Navigator.pop(
-                                context); // Navigate back after deletion
+                            Navigator.pop(context);
                           }
                         },
-                        icon: const Icon(Icons.delete,
-                            color: Colors.white), // White icon for delete
+                        icon: const Icon(Icons.delete, color: Colors.white),
                         label: const Text('Delete Course'),
                         style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              Colors.red, // Red background for Delete button
-                          foregroundColor: Colors
-                              .white, // White text color for Delete button
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
@@ -455,43 +490,37 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
-  Widget _buildDetailCard({
-    required String title,
-    required String content,
-    required IconData icon,
-  }) {
+  Widget _buildDetailCard(String title, String content, IconData icon,
+      Color titleColor, Color bgColor) {
     return Container(
       padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: Colors.grey[200]!),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: titleColor.withOpacity(0.3)),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, size: 20, color: Colors.blue),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            content,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
+          Icon(icon, size: 28, color: titleColor),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: titleColor)),
+                const SizedBox(height: 6),
+                Text(
+                  content,
+                  style: const TextStyle(fontSize: 15, color: Colors.black87),
+                ),
+              ],
+            ),
           ),
         ],
       ),

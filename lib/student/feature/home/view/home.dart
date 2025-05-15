@@ -15,83 +15,196 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int select = 0; // Track the selected index
+  int _selectedIndex = 0;
+  final _pageController = PageController();
+
+  final List<Widget> _pages = [
+    Dashbord(),
+    const Chat(),
+    Notifications(),
+    const Person(),
+  ];
+
+  final List<String> _pageTitles = [
+    "My Courses",
+    "Messages",
+    "Notifications",
+    "Profile",
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // List of pages to navigate
-    List<Widget> item = [
-      Dashbord(), // Dashboard page
-      const Chat(), // Chat page
-      Notifications(), // Notifications page
-      const Person(), // Person info page
-    ];
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: _buildAppBar(context),
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(), // Disable swipe
+        children: _pages,
+      ),
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
 
-    // Titles for each page
-    List<String> pageTitles = [
-      "Dashboard",
-      "Chat",
-      "Notifications",
-      "Person",
-    ];
-
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("assets/image/background.png"),
-          fit: BoxFit.fill,
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: AppTheme.blu,
+      title: Text(
+        _pageTitles[_selectedIndex],
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
       ),
-      child: Scaffold(
-        appBar: AppBar(
-          leading: Container(),
-          title: Text(
-            pageTitles[
-                select], // Display corresponding title based on selected page
-            style: Theme.of(context).textTheme.displayLarge,
-          ),
-          centerTitle: true,
+      centerTitle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(20),
         ),
-        body: item[select], // Display selected page from the list
+      ),
+      actions: [
+        if (_selectedIndex == 0) // Show only on dashboard
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {
+              // Add search functionality
+            },
+          ),
+      ],
+    );
+  }
 
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.shifting,
-          selectedItemColor: AppTheme.blu, // Blue color for selected item
-          unselectedItemColor: Colors.black, // Black color for unselected items
-          currentIndex: select, // Current selected index
+  Widget _buildBottomNavBar() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
           onTap: (index) {
             setState(() {
-              select = index; // Update the selected page
+              _selectedIndex = index;
+              _pageController.jumpToPage(index);
             });
           },
-          items: const [
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: AppTheme.blu,
+          unselectedItemColor: Colors.grey[600],
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+          showUnselectedLabels: true,
+          elevation: 10,
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.dashboard,
-                size: 35,
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: _selectedIndex == 0
+                      ? AppTheme.blu.withOpacity(0.2)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.dashboard_outlined),
               ),
-              label: "Dashboard",
+              activeIcon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppTheme.blu.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.dashboard),
+              ),
+              label: "Home",
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.chat,
-                size: 35,
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: _selectedIndex == 1
+                      ? AppTheme.blu.withOpacity(0.2)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.chat_outlined),
+              ),
+              activeIcon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppTheme.blu.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.chat),
               ),
               label: "Chat",
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.notification_important_rounded,
-                size: 35,
+              icon: Badge(
+                backgroundColor: Colors.red,
+                label: const Text("3"), // Dynamic count can be added
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: _selectedIndex == 2
+                        ? AppTheme.blu.withOpacity(0.2)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.notifications_outlined),
+                ),
               ),
-              label: "Notifications",
+              activeIcon: Badge(
+                backgroundColor: Colors.red,
+                label: const Text("3"),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.blu.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.notifications),
+                ),
+              ),
+              label: "Alerts",
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person,
-                size: 35,
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: _selectedIndex == 3
+                      ? AppTheme.blu.withOpacity(0.2)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.person_outline),
               ),
-              label: "Person",
+              activeIcon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppTheme.blu.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.person),
+              ),
+              label: "Profile",
             ),
           ],
         ),

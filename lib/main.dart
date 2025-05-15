@@ -29,57 +29,56 @@ import 'teacher/feature_teacher/authentication_teacher/view/login_teacher.dart';
 import 'teacher/feature_teacher/authentication_teacher/view/register_teacher.dart';
 import 'teacher/feature_teacher/screen_home_teacher/view/screen_home_teacher.dart';
 
-
 Future<void> main() async {
-
-
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-
   );
-  Bloc.observer=AppBlocObserver();
-  runApp( MultiBlocProvider( providers: [
-    BlocProvider(create: (_)=>AuthBloc()), 
-    BlocProvider(create: (_)=>ViewModelRoom()),
-    BlocProvider(create: (_)=>ChatViewModel()),
-    BlocProvider(create: (_)=>AuthBlocTeacher()),
-    BlocProvider(create: (_)=>AuthBlocAdmin()),
-    BlocProvider(create: (_)=>AuthBlocParent()),
-  ]
-      ,child:   const SmartAcademy()));
+  Bloc.observer = AppBlocObserver();
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AuthBloc()),
+        BlocProvider(create: (_) => ViewModelRoom()),
+        BlocProvider(create: (_) => ChatViewModel()),
+        BlocProvider(create: (_) => AuthBlocTeacher()),
+        BlocProvider(create: (_) => AuthBlocAdmin()),
+        BlocProvider(create: (_) => AuthBlocParent()),
+      ],
+      child: const SmartAcademy(),
+    ),
+  );
 }
 
-class SmartAcademy extends StatelessWidget{
+class SmartAcademy extends StatelessWidget {
   const SmartAcademy({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-   return MaterialApp(
-     debugShowCheckedModeBanner: false,
-    home: const Login(),
-    routes: {
-      HomeScreen.routeName :(context)=>const HomeScreen(),
-      Login.routeName :(context)=>const Login(),
-      Register.routeName :(context)=>const Register(),
-      CreateRoomScreen.routeName :(context)=>const CreateRoomScreen(),
-      Chat.routeName :(context)=>const  Chat(),
-      ChatHome.routeName :(context)=>const ChatHome(),
-      SelectCategory.routeName : (context)=>const SelectCategory(),
-      LoginTeacher.routeName :(context)=>const LoginTeacher(),
-      LoginParent.routeName :(context)=>const LoginParent(),
-      RegisterParent.routeName :(context)=>const RegisterParent(),
-      RegisterTeacher.routeName :(context)=>const RegisterTeacher(),
-      LoginAdmin.routeName :(context)=>const LoginAdmin(),
-      RegisterAdmin.routeName :(context)=>const RegisterAdmin(),
-      HomeScreenTeacher.routeName :(context)=>HomeScreenTeacher(),
-      ScreenHomeAdmin .routeName :(context)=>const ScreenHomeAdmin(),
-      ScreenHomeParent.routeName :(context)=> const ScreenHomeParent()
-    },initialRoute: SelectCategory.routeName,
-
-     theme: AppTheme.light,
-     themeMode: ThemeMode.light,
-   );
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const Login(),
+      routes: {
+        HomeScreen.routeName: (context) => const HomeScreen(),
+        Login.routeName: (context) => const Login(),
+        Register.routeName: (context) => const Register(),
+        CreateRoomScreen.routeName: (context) => const CreateRoomScreen(),
+        Chat.routeName: (context) => const Chat(),
+        ChatHome.routeName: (context) => const ChatHome(),
+        SelectCategory.routeName: (context) => const SelectCategory(),
+        LoginTeacher.routeName: (context) => const LoginTeacher(),
+        LoginParent.routeName: (context) => const LoginParent(),
+        RegisterParent.routeName: (context) => const RegisterParent(),
+        RegisterTeacher.routeName: (context) => const RegisterTeacher(),
+        LoginAdmin.routeName: (context) => const LoginAdmin(),
+        RegisterAdmin.routeName: (context) => const RegisterAdmin(),
+        HomeScreenTeacher.routeName: (context) => HomeScreenTeacher(),
+        ScreenHomeAdmin.routeName: (context) => const ScreenHomeAdmin(),
+        ScreenHomeParent.routeName: (context) => const ScreenHomeParent(),
+      },
+      initialRoute: SelectCategory.routeName, // تحديد الصفحة الأولية
+      theme: AppTheme.light,
+      themeMode: ThemeMode.light,
+    );
   }
 }

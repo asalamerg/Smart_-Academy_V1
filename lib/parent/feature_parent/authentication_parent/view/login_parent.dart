@@ -26,8 +26,6 @@ class LoginParent extends StatefulWidget{
 class _LoginState extends State<LoginParent> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  TextEditingController  idController =TextEditingController();
-
   var formKey = GlobalKey<FormState>();
 
   @override
@@ -59,9 +57,7 @@ class _LoginState extends State<LoginParent> {
                 DefaultTextFormField(title: "Password",
                     controller: passwordController,
                     validator: validation.password),
-                DefaultTextFormField(title: "ID Student",
-                    controller: idController,
-                    validator: validation.password),
+
 
                 SizedBox(height: MediaQuery
                     .of(context)
@@ -115,22 +111,12 @@ class _LoginState extends State<LoginParent> {
     );
   }
 
-  // void loginParent() {
-  //
-  //     if (formKey.currentState!.validate()) {
-  //       BlocProvider.of<AuthBlocParent>(context).loginViewModelParent(
-  //           email: emailController.text, password: passwordController.text);
-  //
-  //   }
-  // }
-
   void loginParent() {
-    if (formKey.currentState!.validate()) {
-      BlocProvider.of<AuthBlocParent>(context).loginViewModelParent(
-        email: emailController.text,
-        password: passwordController.text,
-        studentId: idController.text, // تمرير معرف الطالب
-      );
+
+      if (formKey.currentState!.validate()) {
+        BlocProvider.of<AuthBlocParent>(context).loginViewModelParent(
+            email: emailController.text, password: passwordController.text);
+
     }
   }
 

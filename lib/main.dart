@@ -53,7 +53,8 @@ Future<void> main() async {
 class SmartAcademy extends StatelessWidget{
   const SmartAcademy({super.key});
 
-  @override  Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
 
    return MaterialApp(
      debugShowCheckedModeBanner: false,

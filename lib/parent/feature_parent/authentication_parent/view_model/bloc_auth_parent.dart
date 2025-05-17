@@ -11,18 +11,29 @@ class AuthBlocParent extends Cubit<AuthStatusParent>{
 
   ModelParent? modelParent ;
 
+  //
+  // Future<void> loginViewModelParent({required String email , required String password})async{
+  //   emit(LoginAuthLoadingParent());
+  //   try{
+  //     modelParent=  await  FunctionFirebaseParent.loginAccountParent(email, password);
+  //
+  //     emit(LoginAuthSuccessParent());
+  //
+  //   }catch(e){
+  //
+  //     emit(LoginAuthErrorParent(error: e.toString()));
+  //   }}
 
-  Future<void> loginViewModelParent({required String email , required String password})async{
+
+  Future<void> loginViewModelParent({required String email, required String password, required String studentId}) async {
     emit(LoginAuthLoadingParent());
-    try{
-      modelParent=  await  FunctionFirebaseParent.loginAccountParent(email, password);
-
+    try {
+      modelParent = await FunctionFirebaseParent.loginAccountParent(email, password, studentId);
       emit(LoginAuthSuccessParent());
-
-    }catch(e){
-
+    } catch (e) {
       emit(LoginAuthErrorParent(error: e.toString()));
-    }}
+    }
+  }
 
   Future<void> registerViewModelParent({required String name , required String password , required String numberId ,required String email })async{
     emit(RegisterAuthLoadingParent());

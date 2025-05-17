@@ -92,12 +92,17 @@ class FunctionFirebaseParent {
   }
 
   /// تسجيل الدخول لحساب ولي الأمر
-  static Future<ModelParent> loginAccountParent(String email, String password) async {
+  static Future<ModelParent> loginAccountParent(String email, String password, String studentId) async {
     UserCredential userCredential =
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
 
     DocumentSnapshot<ModelParent> documentSnapshot =
-    await getCollectionUser().doc(userCredential.user!.uid).get();
+    await getCollectionUser ().doc(userCredential.user!.uid).get();
+
+    // تحديث بيانات المستخدم لتشمل معرف الطالب
+    await getCollectionUser ().doc(userCredential.user!.uid).update({
+      'linkedStudentId': studentId, // إضافة معرف الطالب
+    });
 
     return documentSnapshot.data()!;
   }

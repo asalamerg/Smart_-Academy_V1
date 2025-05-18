@@ -38,6 +38,8 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
     final end = endTimeController.text.trim();
     final capacity = int.tryParse(capacityController.text.trim()) ?? 0;
     final courseCode = courseCodeController.text.trim();
+    bool isActive = true;
+    bool canEnroll = true;
 
     // Example file URLs
     List<String> files = ['https://example.com/file1.pdf'];
@@ -63,6 +65,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
         files: files,
         students: students, // List of students
         canEnroll: canEnroll, // Add canEnroll to the course
+        isActive: isActive,
       );
 
       Navigator.pop(context); // Go back after saving

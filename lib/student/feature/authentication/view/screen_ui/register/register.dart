@@ -7,38 +7,14 @@ import 'package:smart_academy/student/feature/authentication/view_model/auth_blo
 import 'package:smart_academy/student/feature/authentication/view_model/auth_status.dart';
 import 'package:smart_academy/student/feature/home/view/home.dart';
 
-// Loading Widget
-class Loading extends StatelessWidget {
-  const Loading({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        ModalBarrier(
-          dismissible: false,
-          color: Colors.black.withOpacity(0.3),
-        ),
-        const Center(
-          child: CircularProgressIndicator(
-            color: Colors.blueAccent,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// Default Button Widget
+// Default Button Widget (without loading animation)
 class DefaultButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String title;
-  final bool isLoading;
 
   const DefaultButton({
     required this.onPressed,
     required this.title,
-    this.isLoading = false,
     super.key,
   });
 
@@ -56,27 +32,18 @@ class DefaultButton extends StatelessWidget {
         elevation: 2,
         minimumSize: const Size(double.infinity, 50),
       ),
-      child: isLoading
-          ? const SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
-            )
-          : Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }
 
-// Default TextFormField Widget
+// Default TextFormField Widget (unchanged)
 class DefaultTextFormField extends StatefulWidget {
   final String title;
   final TextEditingController controller;
@@ -147,7 +114,7 @@ class _DefaultTextFormFieldState extends State<DefaultTextFormField> {
   }
 }
 
-// Register Screen
+// Register Screen (without Loading widget or animation)
 class Register extends StatefulWidget {
   static const String routeName = "register";
 
@@ -158,11 +125,11 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController idController = TextEditingController();
-  var formKey = GlobalKey<FormState>();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController idController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -269,19 +236,10 @@ class _RegisterState extends State<Register> {
                           }
                         },
                         builder: (context, state) {
-                          return Stack(
-                            children: [
-                              DefaultButton(
-                                onPressed: state is RegisterAuthLoading
-                                    ? null
-                                    : register,
-                                title: state is RegisterAuthLoading
-                                    ? "Registering..."
-                                    : "Register",
-                                isLoading: state is RegisterAuthLoading,
-                              ),
-                              if (state is RegisterAuthLoading) const Loading(),
-                            ],
+                          return DefaultButton(
+                            onPressed:
+                                state is RegisterAuthLoading ? null : register,
+                            title: "Register",
                           );
                         },
                       ),

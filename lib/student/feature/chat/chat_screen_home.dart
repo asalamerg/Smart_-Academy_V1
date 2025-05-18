@@ -28,11 +28,8 @@ import 'package:smart_academy/student/feature/chat/room/view_model/view_model_ro
 import 'room/view/create_room_screen.dart';
 import 'room/view/room_screen.dart';
 
-
-
-
 class Chat extends StatefulWidget {
-  static const routeName="chat";
+  static const routeName = "chat";
 
   const Chat({super.key});
 
@@ -41,37 +38,31 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  final viewModel=ViewModelRoom() ;
+  final viewModel = ViewModelRoom();
 
   @override
   void initState() {
     super.initState();
-    viewModel.getRoomViewModel();
+    // viewModel.getRoomViewModel();
   }
 
-
   @override
-
   @override
-
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (_) => viewModel,
-    child: Scaffold(
-    body: const RoomScreen(),
-
-
-    floatingActionButton: FloatingActionButton(
-    onPressed: () => Navigator.of(context).pushNamed(CreateRoomScreen.routeName).then((value)=>viewModel.getRoomViewModel()),
-
-    backgroundColor: Colors.blue,
-    shape: const CircleBorder(side: BorderSide(width: 3, color: Colors.white)),
-    child: const Icon(Icons.add, size: 40, color: Colors.white),
-    ) ,
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-
-
-    ));
+        child: Scaffold(
+          body: const RoomScreen(),
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () => Navigator.of(context)
+          //       .pushNamed(CreateRoomScreen.routeName)
+          //       .then((value) => viewModel.getRoomViewModel()),
+          //   backgroundColor: Colors.blue,
+          //   shape: const CircleBorder(
+          //       side: BorderSide(width: 3, color: Colors.white)),
+          //   child: const Icon(Icons.add, size: 40, color: Colors.white),
+          // ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        ));
   }
 }

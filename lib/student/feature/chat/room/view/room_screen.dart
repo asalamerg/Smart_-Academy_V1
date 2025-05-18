@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -34,7 +33,7 @@ class _RoomScreenState extends State<RoomScreen> {
     super.didChangeDependencies();
     if (_isInit) {
       viewModel = BlocProvider.of<ViewModelRoom>(context);
-      viewModel.getRoomViewModel();
+      // viewModel.getRoomViewModel();
       _isInit = false;
     }
   }
@@ -168,7 +167,9 @@ class _ChatHomeState extends State<ChatHome> {
                             itemCount: message.length,
                             itemBuilder: (context, index) {
                               final messages = message[index];
-                              final isMessage = BlocProvider.of<ChatViewModel>(context).isMyMessage(
+                              final isMessage =
+                                  BlocProvider.of<ChatViewModel>(context)
+                                      .isMyMessage(
                                 userId: userModel.id,
                                 senderId: messages.id,
                               );

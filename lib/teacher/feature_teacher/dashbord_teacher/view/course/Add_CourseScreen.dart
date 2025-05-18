@@ -182,6 +182,8 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
             "Allow Students to Enroll",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
+
+          // zx
           Switch(
             value: canEnroll,
             onChanged: (value) {

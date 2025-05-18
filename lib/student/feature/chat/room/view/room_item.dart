@@ -4,7 +4,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:smart_academy/student/feature/chat/room/model/room_model.dart';
 import 'package:smart_academy/student/feature/chat/room/view_model/view_model_room.dart';
 
-
 class RoomItem extends StatelessWidget {
   final RoomModel roomModel;
 
@@ -16,13 +15,15 @@ class RoomItem extends StatelessWidget {
       key: ValueKey(roomModel.id),
       startActionPane: ActionPane(
         motion: const ScrollMotion(),
-        dismissible: DismissiblePane(onDismissed: () {
-          BlocProvider.of<ViewModelRoom>(context).deleteRoomViewModel(roomModel.id);
-        }),
+        dismissible: DismissiblePane(
+          onDismissed: () {
+            context.read<ViewModelRoom>().deleteRoom(roomModel.id);
+          },
+        ),
         children: [
           SlidableAction(
             onPressed: (context) {
-              BlocProvider.of<ViewModelRoom>(context).deleteRoomViewModel(roomModel.id);
+              context.read<ViewModelRoom>().deleteRoom(roomModel.id);
             },
             backgroundColor: const Color(0xFFFE4A49),
             foregroundColor: Colors.white,
@@ -30,13 +31,12 @@ class RoomItem extends StatelessWidget {
             label: 'Delete',
             borderRadius: BorderRadius.circular(25),
             padding: const EdgeInsets.all(10),
-
           ),
         ],
       ),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.45,
-        padding: const EdgeInsets.only(left: 20 ,right: 20 ,bottom: 10  ),
+        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -46,11 +46,29 @@ class RoomItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/image/chat.png",
-              height: MediaQuery.of(context).size.height * 0.15, width: MediaQuery.of(context).size.width * 0.25, fit: BoxFit.fill,),
-            Text(roomModel.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),),
-            Text(roomModel.description, maxLines: 3, overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w400, color: Colors.blue),
+            Image.asset(
+              "assets/image/chat.png",
+              height: MediaQuery.of(context).size.height * 0.15,
+              width: MediaQuery.of(context).size.width * 0.25,
+              fit: BoxFit.fill,
+            ),
+            Text(
+              roomModel.name,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            Text(
+              roomModel.description,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w400,
+                color: Colors.blue,
+              ),
             ),
           ],
         ),

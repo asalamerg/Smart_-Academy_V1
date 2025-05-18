@@ -1,116 +1,79 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:smart_academy/shared/error/show_error.dart';
-import 'package:smart_academy/shared/loading/loading_indicator.dart';
-import 'package:smart_academy/shared/widget/default_button.dart';
-import 'package:smart_academy/shared/widget/textformfield.dart';
-import 'package:smart_academy/shared/widget/validation.dart';
-import 'package:smart_academy/student/feature/chat/chat_screen_home.dart';
-import 'package:smart_academy/student/feature/chat/room/model/room_model.dart';
+import 'package:smart_academy/shared/error/error.dart';
+import 'package:smart_academy/shared/loading/loading.dart';
 import 'package:smart_academy/student/feature/chat/room/view_model/status_room.dart';
 import 'package:smart_academy/student/feature/chat/room/view_model/view_model_room.dart';
+import '../../chat_chat/view/chat_screen.dart';
+import 'room_item.dart';
 
-
-
-class CreateRoomScreen extends StatefulWidget{
-  static const routeName="create_room_screen";
-
-  const CreateRoomScreen({super.key});
+class RoomScreen extends StatefulWidget {
+ static const String routeName="RoomScreen";
+  const RoomScreen({super.key});
 
   @override
-  State<CreateRoomScreen> createState() => _CreateRoomScreenState();
+  State<RoomScreen> createState() => _RoomScreenState();
 }
 
-class _CreateRoomScreenState extends State<CreateRoomScreen> {
-  final formKey = GlobalKey<FormState>();
-
-  TextEditingController roomName = TextEditingController();
-  TextEditingController roomDescription = TextEditingController();
-  final viewModel=ViewModelRoom() ;
-
+class _RoomScreenState extends State<RoomScreen> {
+  late ViewModelRoom _viewModel;
+  bool _isInit = true;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _viewModel = context.read<ViewModelRoom>();
+      _viewModel.loadRooms();
+      _isInit = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
-
-    return Form(
-      key: formKey,
-      child: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage("assets/image/background.png"),
-              fit: BoxFit.fill),
-        ),
-        child: BlocProvider(
-          create: (context)=>viewModel,
-          child: Scaffold(
-
-            backgroundColor: Colors.transparent,
-            appBar: AppBar(title: Text("Create Room ",style: Theme.of(context).textTheme.displayLarge),
-
-            foregroundColor: Colors.white,),
-            body: SingleChildScrollView(
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                margin: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.15),
-                child: Column(children: [
-                  Image(image: const AssetImage("assets/image/room.png")
-                    , height: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.15,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width * 0.40,
-                    fit: BoxFit.fill,
-                  ),
-                  DefaultTextFormField(title: "Enter Courses Name ",
-                    controller: roomName,
-                    validator: validation.name,),
-                  DefaultTextFormField(title: "Enter Description Courses",
-                    controller: roomDescription,
-                    validator: validation.description,),
-
-
-                  BlocListener<ViewModelRoom,StatusRoom>
-                    ( listener :(_,status){
-                      if(status is CreateRoomLoading){ const LoadingIndicator();}
-                      else if(status is CreateRoomSuccess){
-                        Navigator.of(context).pushReplacementNamed(Chat.routeName);
-                        ToastHelper.showSuccess("The operation was successful. ");
-
-
-                      }
-                      else if(status is CreateRoomError){
-
-                        ToastHelper.showError(" Something went wrong");
-                      }
-
-
-                  },child : DefaultButton(title: "Create ", onPressed: createRoom,)),
-                ],),
-              ),
-            ),
-          ),
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: BlocConsumer<ViewModelRoom, StatusRoom>(
+          listener: (context, state) {
+            if (state is DeleteRoomError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('خطأ أثناء الحذف: ${state.message}')),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is RoomLoading) {
+              return const Loading();
+            } else if (state is RoomError) {
+              return ErrorIndicator(message: state.message);
+            } else if (state is RoomLoaded) {
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.8,
+                  mainAxisSpacing: 2,
+                  crossAxisSpacing: 2,
+                ),
+                itemCount: _viewModel.rooms.length,
+                itemBuilder: (context, index) => InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      ChatHome.routeName,
+                      arguments: _viewModel.rooms[index],
+                    );
+                  },
+                  child: RoomItem(roomModel: _viewModel.rooms[index]),
+                ),
+              );
+            }
+            return const SizedBox();
+          },
         ),
       ),
     );
-
-  }
-  void createRoom() {
-    if (formKey.currentState!.validate()) {
-
-      BlocProvider.of<ViewModelRoom>(context).createRoomViewModel(
-          RoomModel(description:roomDescription.text , name: roomName.text));
-      Navigator.of(context).pop();
-
-    }
-
   }
 }

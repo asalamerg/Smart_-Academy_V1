@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class  DefaultTextField extends StatelessWidget{
   TextEditingController controllerContent;
 
-   DefaultTextField({super.key , required this.controllerContent , });
+   DefaultTextField({super.key , required this.controllerContent, required String hintText, required Future<void> Function(dynamic _) onSubmitted , });
 
   @override
   Widget build(BuildContext context) {

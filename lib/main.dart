@@ -8,7 +8,7 @@ import 'package:smart_academy/admin/feature_admin/screen_home_admin/view/screen_
 
 import 'package:smart_academy/firebase_options.dart';
 import 'package:smart_academy/shared/bloc_observer.dart';
-import 'package:smart_academy/student/feature/chat/room/view/room_screen.dart';
+import 'package:smart_academy/student/feature/chat/chat_chat/view/chat_screen.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_bloc_teacher.dart';
 
 import 'parent/feature_parent/authentication_parent/view/login_parent.dart';
@@ -63,7 +63,7 @@ class SmartAcademy extends StatelessWidget{
       HomeScreen.routeName :(context)=>const HomeScreen(),
       Login.routeName :(context)=>const Login(),
       Register.routeName :(context)=>const Register(),
-      CreateRoomScreen.routeName :(context)=>const CreateRoomScreen(),
+      RoomScreen.routeName :(context)=> RoomScreen(),
       Chat.routeName :(context)=>const  Chat(),
       ChatHome.routeName :(context)=>const ChatHome(),
       SelectCategory.routeName : (context)=>const SelectCategory(),
@@ -73,7 +73,7 @@ class SmartAcademy extends StatelessWidget{
       RegisterTeacher.routeName :(context)=>const RegisterTeacher(),
       LoginAdmin.routeName :(context)=>const LoginAdmin(),
       RegisterAdmin.routeName :(context)=>const RegisterAdmin(),
-      HomeScreenTeacher.routeName :(context)=>HomeScreenTeacher(),
+      HomeScreenTeacher.routeName :(context)=>const HomeScreenTeacher(),
       ScreenHomeAdmin .routeName :(context)=>const ScreenHomeAdmin(),
       ScreenHomeParent.routeName :(context)=> const ScreenHomeParent()
     },initialRoute: SelectCategory.routeName,

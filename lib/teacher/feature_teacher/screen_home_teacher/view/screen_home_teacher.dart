@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // استيراد FirebaseAuth
 import 'package:cloud_firestore/cloud_firestore.dart'; // استيراد Firestore
+import 'package:smart_academy/student/feature/chat/chat_screen_home.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/model/model_teacher.dart';
 import 'package:smart_academy/teacher/feature_teacher/dashbord_teacher/view/dashbord_teacher.dart';
 import 'package:smart_academy/teacher/feature_teacher/person_teacher/view/person_teacher.dart';
@@ -100,10 +101,8 @@ class _HomeScreenTeacherState extends State<HomeScreenTeacher> {
                 ),
                 centerTitle: true,
               ),
-              body: select == 0
-                  ? DashbordTeacher(
-                      teacher: teacher,
-                    )
+              body: select == 0  ? DashbordTeacher(teacher: teacher,)
+                  : select ==1  ? Chat()
                   : PersonTeacher(), // تمرير بيانات المعلم إلى DashbordTeacher أو PersonTeacher
               bottomNavigationBar: BottomNavigationBar(
                 currentIndex: select,
@@ -113,14 +112,9 @@ class _HomeScreenTeacherState extends State<HomeScreenTeacher> {
                   });
                 },
                 items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.dashboard),
-                    label: 'Dashboard',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Person Info',
-                  ),
+                  BottomNavigationBarItem( icon: Icon(Icons.dashboard), label: 'Dashboard',),
+                  BottomNavigationBarItem( icon: Icon(Icons.chat), label: 'chat',),
+                  BottomNavigationBarItem( icon: Icon(Icons.person), label: 'Person Info',),
                 ],
               ),
             ),

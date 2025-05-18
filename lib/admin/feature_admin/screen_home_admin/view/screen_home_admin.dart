@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_academy/admin/feature_admin/dashbord_admin/view/dashbord_admin.dart';
 import 'package:smart_academy/admin/feature_admin/person_admin/view/person_admin.dart';
 import 'package:smart_academy/shared/theme/apptheme.dart';
+import 'package:smart_academy/student/feature/chat/chat_screen_home.dart';
 
 class ScreenHomeAdmin extends StatefulWidget{
   static const  String routeName="ScreenHomeAdmin";
@@ -18,6 +19,7 @@ class _ScreenHomeAdminState extends State<ScreenHomeAdmin> {
   int select=0;
   List<Widget> item=[
     DashbordAdmin(),
+    Chat(),
     const PersonAdmin()
   ];
   @override
@@ -46,7 +48,7 @@ class _ScreenHomeAdminState extends State<ScreenHomeAdmin> {
             items: const [
 
               BottomNavigationBarItem(icon: Icon(Icons.dashboard,size: 35,),label: "DashBord",),
-
+              BottomNavigationBarItem(icon: Icon(Icons.chat,size: 35,),label: "chat",),
               BottomNavigationBarItem(icon: Icon(Icons.person ,size: 35,),label: "person"),
             ]),
         // appBar: AppBar(title: Text("Welcome"),),

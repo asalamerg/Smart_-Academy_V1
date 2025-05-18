@@ -1,9 +1,7 @@
 
 class RoomModel {
   String id;
-
   String name;
-
   String description;
 
   RoomModel({ this.id="", required this.description, required this.name});

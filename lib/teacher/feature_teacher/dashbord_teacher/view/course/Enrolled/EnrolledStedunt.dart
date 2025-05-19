@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smart_academy/teacher/feature_teacher/dashbord_teacher/view/course/Enrolled/Attendance_Screen.dart';
-import 'package:smart_academy/teacher/feature_teacher/dashbord_teacher/view/course/Enrolled/Grades_Screen.dart';
+import 'package:smart_academy/teacher/feature_teacher/dashbord_teacher/view/course/Enrolled/for_student/attendance/Attendance_Screen.dart';
+import 'package:smart_academy/teacher/feature_teacher/dashbord_teacher/view/course/Enrolled/for_student/grades/Grades_Screen.dart';
+import 'package:smart_academy/teacher/feature_teacher/dashbord_teacher/view/course/Enrolled/for_student/student/StudentDetail_Screen.dart';
 
 class EnrolledStudentsScreen extends StatelessWidget {
   final List<Map<String, dynamic>> students;
@@ -15,7 +16,7 @@ class EnrolledStudentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // خلفية بيضاء
+      backgroundColor: Colors.white, // White background
       appBar: AppBar(
         title: const Text('Enrolled Students'),
         backgroundColor: Colors.blue,
@@ -33,7 +34,17 @@ class EnrolledStudentsScreen extends StatelessWidget {
                     child: Icon(Icons.person, color: Colors.white),
                   ),
                   title: Text(student['name'] ?? 'No Name'),
-                  // يمكنك إضافة المزيد من التفاصيل مثل البريد الإلكتروني هنا
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StudentDetailScreen(
+                          student: student,
+                          courseId: courseId,
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

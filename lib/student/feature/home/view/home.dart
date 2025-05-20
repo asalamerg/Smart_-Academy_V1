@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:smart_academy/chat/main_chat_screen.dart';
 import 'package:smart_academy/shared/theme/apptheme.dart';
 import 'package:smart_academy/student/feature/Notifications/view/notifications.dart';
-import 'package:smart_academy/student/feature/chat/chat_screen_home.dart';
 import 'package:smart_academy/student/feature/dashbord/view/dashbord.dart';
 import 'package:smart_academy/student/feature/person/view/person.dart';
 
@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = [
     Dashbord(),
-    const Chat(),
+    MainChatScreen(),
     Notifications(),
     const Person(),
   ];

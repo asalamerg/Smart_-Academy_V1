@@ -1,11 +1,9 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'room_model.dart';
 
 class FirebaseRoom{
 
-static  CollectionReference<RoomModel>  createCollectionRoom()=>FirebaseFirestore.instance.collection("Room")
+static  CollectionReference<RoomModel>  createCollectionRoom()=>FirebaseFirestore.instance.collection("room")
       .withConverter<RoomModel>(
       fromFirestore: (docSnapShot,_)=>RoomModel.fromJson(docSnapShot.data()!),
       toFirestore: (model,_)=>model.toJson() );

@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:smart_academy/admin/feature_admin/dashbord_admin/view/dashbord_admin.dart';
 import 'package:smart_academy/admin/feature_admin/person_admin/view/person_admin.dart';
+import 'package:smart_academy/chat/main_chat_screen.dart';
 import 'package:smart_academy/shared/theme/apptheme.dart';
-import 'package:smart_academy/student/feature/chat/chat_screen_home.dart';
 
 class ScreenHomeAdmin extends StatefulWidget{
   static const  String routeName="ScreenHomeAdmin";
@@ -19,7 +19,7 @@ class _ScreenHomeAdminState extends State<ScreenHomeAdmin> {
   int select=0;
   List<Widget> item=[
     DashbordAdmin(),
-    Chat(),
+    MainChatScreen(),
     const PersonAdmin()
   ];
   @override

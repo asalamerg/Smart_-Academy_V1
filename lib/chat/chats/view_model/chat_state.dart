@@ -1,36 +1,22 @@
-//
-//
-// import 'package:smart_academy/student/feature/chat/chat_chat/model/message_model.dart';
-//
-// abstract class ChatState{}
-//
-// class ChatInitial extends ChatState{}
-//
-// class SentChatStateLoading extends ChatState{}
-// class SentChatStateError extends ChatState{      String messageError ; SentChatStateError(this.messageError);}
-// class SentChatStateSuccess extends ChatState{}
-//
-// class GetChatStateLoading extends ChatState{}
-// class GetChatStateError extends ChatState{        String messageError ; GetChatStateError(this.messageError);}
-// class GetChatStateSuccess extends ChatState{
-//   Stream<List<MessageModel>> messageStream ;
-//   GetChatStateSuccess({required this.messageStream});
-// }
 
-import '../model/message_model.dart';
+
+import 'package:smart_academy/chat/chats/model/message_model.dart';
 
 abstract class ChatState {}
 
 class ChatInitial extends ChatState {}
 
-class ChatLoading extends ChatState {}
+class SentChatLoading extends ChatState {}
 
-class ChatLoaded extends ChatState {
-  final List<MessageModel> messages;
-  ChatLoaded(this.messages);
+class SentChatSuccess extends ChatState {}
+
+class SentChatError extends ChatState {  final String message;  SentChatError(this.message);}
+
+class GetChatLoading extends ChatState {}
+
+class GetChatSuccess extends ChatState {
+  Stream<List<MessageModel>> streamMessage;
+  GetChatSuccess(this.streamMessage);
 }
 
-class ChatError extends ChatState {
-  final String message;
-  ChatError(this.message);
-}
+class GetChatError extends ChatState { final String message;  GetChatError(this.message);}

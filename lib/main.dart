@@ -9,6 +9,8 @@ import 'package:smart_academy/chat/room/view_model/view_model_room.dart';
 import 'package:smart_academy/firebase_options.dart';
 import 'package:smart_academy/shared/bloc_observer.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_bloc_teacher.dart';
+import 'chat/chats/view/chat_screen.dart';
+import 'chat/chats/view_model/message_view_model.dart';
 import 'chat/main_chat_screen.dart';
 import 'chat/room/view/create_room_screen.dart';
 import 'parent/feature_parent/authentication_parent/view/login_parent.dart';
@@ -42,6 +44,8 @@ Future<void> main() async {
     BlocProvider(create: (_)=>AuthBlocTeacher()),
     BlocProvider(create: (_)=>AuthBlocAdmin()),
     BlocProvider(create: (_)=>AuthBlocParent()),
+    BlocProvider(create: (_)=>MessageViewModel()),
+
 
   ]
       ,child:   const SmartAcademy()));
@@ -61,7 +65,7 @@ class SmartAcademy extends StatelessWidget{
       Login.routeName :(context)=>const Login(),
       Register.routeName :(context)=>const Register(),
       MainChatScreen.routeName :(_)=>const MainChatScreen(),
-      CreateRoomScreen.routeName :(_)=> CreateRoomScreen(),
+      CreateRoomScreen.routeName :(_)=> const CreateRoomScreen(),
       SelectCategory.routeName : (context)=>const SelectCategory(),
       LoginTeacher.routeName :(context)=>const LoginTeacher(),
       LoginParent.routeName :(context)=>const LoginParent(),
@@ -71,8 +75,9 @@ class SmartAcademy extends StatelessWidget{
       RegisterAdmin.routeName :(context)=>const RegisterAdmin(),
       HomeScreenTeacher.routeName :(context)=>const HomeScreenTeacher(),
       ScreenHomeAdmin .routeName :(context)=>const ScreenHomeAdmin(),
-      ScreenHomeParent.routeName :(context)=> const ScreenHomeParent()
-    },initialRoute: ScreenHomeAdmin.routeName,
+      ScreenHomeParent.routeName :(context)=> const ScreenHomeParent(),
+      ChatScreen.routeName :(_)=>const ChatScreen(),
+    },initialRoute: SelectCategory.routeName,
 
      theme: AppTheme.light,
      themeMode: ThemeMode.light,

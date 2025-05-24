@@ -1,16 +1,9 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_academy/chat/chats/model/firebase_message.dart';
 import 'package:smart_academy/chat/chats/model/message_model.dart';
 import 'package:smart_academy/chat/chats/view_model/chat_state.dart';
 import 'package:smart_academy/chat/room/model/room_model.dart';
-
-
-
-
-
 
 class MessageViewModel extends Cubit<ChatState> {
   final TextEditingController messageController = TextEditingController();
@@ -69,10 +62,5 @@ class MessageViewModel extends Cubit<ChatState> {
 
   bool isMyMessage(String senderId) {
     return currentUserId == senderId;
-
-
   }
-
-
-
 }

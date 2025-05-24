@@ -25,6 +25,10 @@ import 'teacher/feature_teacher/authentication_teacher/view/register_teacher.dar
 import 'teacher/feature_teacher/screen_home_teacher/view/screen_home_teacher.dart';
 import 'chat/room/view_model/view_model_room.dart';
 import 'chat/chats/view_model/message_view_model.dart';
+import 'chat/chats/view/chat_screen.dart';
+
+import 'chat/room/view/create_room_screen.dart';
+import 'chat/main_chat_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

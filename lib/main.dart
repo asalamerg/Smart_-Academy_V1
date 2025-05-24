@@ -23,6 +23,8 @@ import 'student/feature/home/view/home.dart';
 import 'teacher/feature_teacher/authentication_teacher/view/login_teacher.dart';
 import 'teacher/feature_teacher/authentication_teacher/view/register_teacher.dart';
 import 'teacher/feature_teacher/screen_home_teacher/view/screen_home_teacher.dart';
+import 'chat/room/view_model/view_model_room.dart';
+import 'chat/chats/view_model/message_view_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

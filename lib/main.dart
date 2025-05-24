@@ -7,8 +7,8 @@ import 'package:smart_academy/admin/feature_admin/authentication_admin/view_mode
 import 'package:smart_academy/admin/feature_admin/screen_home_admin/view/screen_home_admin.dart';
 import 'package:smart_academy/firebase_options.dart';
 import 'package:smart_academy/shared/bloc_observer.dart';
-import 'package:smart_academy/student/feature/chat/room/view/room_screen.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_bloc_teacher.dart';
+
 import 'parent/feature_parent/authentication_parent/view/login_parent.dart';
 import 'parent/feature_parent/authentication_parent/view/register_parent.dart';
 import 'parent/feature_parent/authentication_parent/view_model/bloc_auth_parent.dart';
@@ -18,10 +18,7 @@ import 'shared/theme/apptheme.dart';
 import 'student/feature/authentication/view/screen_ui/login/login.dart';
 import 'student/feature/authentication/view/screen_ui/register/register.dart';
 import 'student/feature/authentication/view_model/auth_bloc.dart';
-import 'student/feature/chat/chat_chat/view_model/chat_view_model.dart';
-import 'student/feature/chat/chat_screen_home.dart';
-import 'student/feature/chat/room/view/create_room_screen.dart';
-import 'student/feature/chat/room/view_model/view_model_room.dart';
+
 import 'student/feature/home/view/home.dart';
 import 'teacher/feature_teacher/authentication_teacher/view/login_teacher.dart';
 import 'teacher/feature_teacher/authentication_teacher/view/register_teacher.dart';
@@ -33,19 +30,14 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Bloc.observer = AppBlocObserver();
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => AuthBloc()),
-        BlocProvider(create: (_) => ViewModelRoom()),
-        BlocProvider(create: (_) => ChatViewModel()),
-        BlocProvider(create: (_) => AuthBlocTeacher()),
-        BlocProvider(create: (_) => AuthBlocAdmin()),
-        BlocProvider(create: (_) => AuthBlocParent()),
-      ],
-      child: const SmartAcademy(),
-    ),
-  );
+  runApp(MultiBlocProvider(providers: [
+    BlocProvider(create: (_) => RoomViewModel()),
+    BlocProvider(create: (_) => AuthBloc()),
+    BlocProvider(create: (_) => AuthBlocTeacher()),
+    BlocProvider(create: (_) => AuthBlocAdmin()),
+    BlocProvider(create: (_) => AuthBlocParent()),
+    BlocProvider(create: (_) => MessageViewModel()),
+  ], child: const SmartAcademy()));
 }
 
 class SmartAcademy extends StatelessWidget {
@@ -60,9 +52,8 @@ class SmartAcademy extends StatelessWidget {
         HomeScreen.routeName: (context) => const HomeScreen(),
         Login.routeName: (context) => const Login(),
         Register.routeName: (context) => const Register(),
-        CreateRoomScreen.routeName: (context) => const CreateRoomScreen(),
-        Chat.routeName: (context) => const Chat(),
-        ChatHome.routeName: (context) => const ChatHome(),
+        MainChatScreen.routeName: (_) => const MainChatScreen(),
+        CreateRoomScreen.routeName: (_) => const CreateRoomScreen(),
         SelectCategory.routeName: (context) => const SelectCategory(),
         LoginTeacher.routeName: (context) => const LoginTeacher(),
         LoginParent.routeName: (context) => const LoginParent(),
@@ -70,11 +61,12 @@ class SmartAcademy extends StatelessWidget {
         RegisterTeacher.routeName: (context) => const RegisterTeacher(),
         LoginAdmin.routeName: (context) => const LoginAdmin(),
         RegisterAdmin.routeName: (context) => const RegisterAdmin(),
-        HomeScreenTeacher.routeName: (context) => HomeScreenTeacher(),
+        HomeScreenTeacher.routeName: (context) => const HomeScreenTeacher(),
         ScreenHomeAdmin.routeName: (context) => const ScreenHomeAdmin(),
         ScreenHomeParent.routeName: (context) => const ScreenHomeParent(),
+        ChatScreen.routeName: (_) => const ChatScreen(),
       },
-      initialRoute: SelectCategory.routeName, // تحديد الصفحة الأولية
+      initialRoute: SelectCategory.routeName,
       theme: AppTheme.light,
       themeMode: ThemeMode.light,
     );

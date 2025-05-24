@@ -371,12 +371,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
 
   Widget _buildAttendanceSection() {
     final attendance = studentInfo?['attendance'] ?? {};
-    final absentDays = attendance.entries
-        .where((e) =>
-            e.value.toString().toLowerCase() == 'absent' ||
-            e.value.toString().toLowerCase() == 'غائب' ||
-            e.value == false)
-        .toList();
+    final absentDays = attendance.entries.toList();
+    print(absentDays);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

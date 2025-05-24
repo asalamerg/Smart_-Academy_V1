@@ -255,3 +255,19 @@ Future<void> setStudentData({
     throw e;
   }
 }
+
+Future<void> setStudentGrades({
+  required String courseId,
+  required String studentId,
+  required Map<String, Map<String, dynamic>> grades,
+}) async {
+  final docRef = FirebaseFirestore.instance
+      .collection('courses')
+      .doc(courseId)
+      .collection('studentData')
+      .doc(studentId);
+
+  await docRef.set({
+    'grades': grades,
+  }, SetOptions(merge: true));
+}

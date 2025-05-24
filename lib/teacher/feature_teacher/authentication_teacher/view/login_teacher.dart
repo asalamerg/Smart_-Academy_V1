@@ -133,7 +133,7 @@ class _LoginTeacherState extends State<LoginTeacher> {
                       label: "Password",
                       icon: Icons.lock_outline,
                       validator: validation.password,
-                      obscureText: _obscurePassword,
+                      // obscureText: _obscurePassword,
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword

@@ -13,6 +13,7 @@ class Course {
   List<String>
       files; // List of file URLs (additional files related to the course)
   bool canEnroll; // Determines if students can enroll in the course
+  bool isActive;
 
   // Constructor
   Course({
@@ -26,6 +27,7 @@ class Course {
     required this.endTime,
     required this.students,
     required this.files,
+    required this.isActive,
     required this.canEnroll, // Adding canEnroll
   });
 
@@ -42,6 +44,7 @@ class Course {
       'students': students, // List of enrolled students
       'files': files,
       'canEnroll': canEnroll, // Include canEnroll in the map
+      'isActive': isActive,
     };
   }
 
@@ -61,6 +64,7 @@ class Course {
           List<String>.from(data['students'] ?? []), // List of student IDs
       files: List<String>.from(data['files'] ?? []),
       canEnroll: data['canEnroll'] ?? true, // Default to true if not provided
+      isActive: data['isActive'] ?? true,
     );
   }
 }

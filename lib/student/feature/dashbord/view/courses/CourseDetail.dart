@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class CourseDetailScreen extends StatelessWidget {
+class CourseDetailScreen extends StatefulWidget {
   final String courseId;
 
   const CourseDetailScreen({super.key, required this.courseId});
 
   @override
+  State<CourseDetailScreen> createState() => _CourseDetailScreenState();
+}
+
+class _CourseDetailScreenState extends State<CourseDetailScreen> {
+  @override
   Widget build(BuildContext context) {
+    final courseId = widget.courseId;
+
     return Scaffold(
       backgroundColor: Colors.white, // Set the background color to white
       appBar: AppBar(
@@ -150,8 +157,8 @@ class CourseDetailScreen extends StatelessWidget {
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
-                          // Add functionality to enroll in the course
-                          _enrollStudent(context, courseId);
+                          // استدعاء دالة التسجيل مع تمرير السياق و رقم الدورة
+                          _enrollStudent(courseId);
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -179,7 +186,6 @@ class CourseDetailScreen extends StatelessWidget {
     );
   }
 
-  // Helper method to build detail cards
   Widget _buildDetailCard({
     required String title,
     required String content,
@@ -215,7 +221,7 @@ class CourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _enrollStudent(BuildContext context, String courseId) async {
+  Future<void> _enrollStudent(String courseId) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final studentId = user.uid;
@@ -228,9 +234,9 @@ class CourseDetailScreen extends StatelessWidget {
           .get();
 
       if (studentCourseDoc.exists) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('You are already enrolled in this course.')),
+          const SnackBar(content: Text('أنت مسجل مسبقاً في هذه الدورة.')),
         );
         return;
       }
@@ -254,58 +260,14 @@ class CourseDetailScreen extends StatelessWidget {
         'Marks': [],
       });
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('You have successfully enrolled in the course!')),
+        const SnackBar(content: Text('تم التسجيل في الدورة بنجاح!')),
       );
     } else {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to enroll in the course.')),
-      );
-    }
-  }
-
-  // Enroll student in the course
-  // Enroll student in the course and add course code to student's record
-  Future<void> _enrollStudent1(BuildContext context, String courseId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final studentId = user.uid;
-
-      // First, add student to the course's student list in Firestore
-      await FirebaseFirestore.instance
-          .collection('courses')
-          .doc(courseId)
-          .update({
-        'students': FieldValue.arrayUnion([studentId]),
-      });
-
-      // Now, add the course code to the student's courses list in Firestore
-      // final courseSnapshot = await FirebaseFirestore.instance
-      //     .collection('courses')
-      //     .doc(courseId)
-      //     .get();
-      // final courseData = courseSnapshot.data() as Map<String, dynamic>;
-      // final courseCode = courseData['courseCode'] ?? 'No Code';
-
-      // Add courseCode to the student's courses list in Firestore
-
-      await FirebaseFirestore.instance
-          .collection('user')
-          .doc(studentId)
-          .update({
-        'courses': FieldValue.arrayUnion(
-            [courseId]), // Add courseCode to the student's courses list
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('You have successfully enrolled in the course!')),
-      );
-    } else {
-      // If the user is not logged in
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to enroll in the course.')),
+        const SnackBar(content: Text('الرجاء تسجيل الدخول للتسجيل في الدورة.')),
       );
     }
   }

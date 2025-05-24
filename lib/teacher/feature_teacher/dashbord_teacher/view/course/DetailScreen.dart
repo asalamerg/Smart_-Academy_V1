@@ -1,10 +1,12 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_academy/cousrses/ControllerCourse.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/model/model_teacher.dart';
+import 'package:smart_academy/teacher/feature_teacher/dashbord_teacher/view/course/Enrolled/EnrolledStedunt.dart';
 import 'package:smart_academy/teacher/feature_teacher/dashbord_teacher/view/course/editCourses.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -339,64 +341,31 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                   ),
                 const SizedBox(height: 30),
 
-                // قائمة الطلاب المسجلين
-                Text('Enrolled Students',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: blueColor,
-                    )),
-                const SizedBox(height: 12),
-                Divider(color: blueColor.withOpacity(0.2)),
-                const SizedBox(height: 12),
-
-                if (students.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      'No students enrolled yet',
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontStyle: FontStyle.italic),
-                    ),
-                  )
-                else
-                  FutureBuilder<List<Map<String, dynamic>>>(
-                    future: studentNamesFuture,
-                    builder: (context, studentSnapshot) {
-                      if (studentSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (studentSnapshot.hasError) {
-                        return Text(
-                            'Error loading students: ${studentSnapshot.error}');
-                      }
-                      final studentsList = studentSnapshot.data ?? [];
-                      return Container(
-                        constraints: const BoxConstraints(maxHeight: 250),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(12),
+                // زر عرض قائمة الطلاب المفتوحة
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final studentsList = await studentNamesFuture;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EnrolledStudentsScreen(
+                          students: studentsList,
+                          courseId: widget.courseId,
                         ),
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: studentsList.length,
-                          itemBuilder: (context, index) {
-                            var student = studentsList[index];
-                            return ListTile(
-                              leading: const CircleAvatar(
-                                backgroundColor: Colors.blue,
-                                child: Icon(Icons.person, color: Colors.white),
-                              ),
-                              title: Text(student['name']),
-                            );
-                          },
-                        ),
-                      );
-                    },
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.people),
+                  label: Text('View Enrolled Students (${students.length})'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
+                ),
 
                 const SizedBox(height: 30),
 
@@ -527,3 +496,5 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 }
+
+// الشاشة الجديدة لعرض الطلاب المسجلين

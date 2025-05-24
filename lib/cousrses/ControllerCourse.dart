@@ -19,6 +19,7 @@ class CourseController {
     required List<String> days,
     required List<String> files,
     required List<String> students,
+    bool isActive = true,
     required bool canEnroll, // Add canEnroll as a parameter
   }) async {
     try {
@@ -35,11 +36,23 @@ class CourseController {
         'students': students,
         'teacherId': teacher.id,
         'createdAt': FieldValue.serverTimestamp(),
-        'canEnroll': canEnroll, // Save canEnroll status
+        'canEnroll': canEnroll,
+        'isActive': isActive,
       });
       print("Course added successfully");
     } catch (e) {
       print("Error adding course: $e");
+    }
+  }
+
+  Future<void> toggleCourseActiveStatus(String courseId, bool isActive) async {
+    try {
+      await _firestore.collection('courses').doc(courseId).update({
+        'isActive': isActive,
+      });
+      print("Course active status updated successfully");
+    } catch (e) {
+      print("Error updating course active status: $e");
     }
   }
 
@@ -56,7 +69,8 @@ class CourseController {
     required List<String> days,
     required List<String> files,
     required List<String> students,
-    required bool canEnroll, // New field for enrollment status
+    required bool canEnroll,
+    required bool isActive, // NEW: Added isActive parameter
   }) async {
     try {
       await _firestore.collection('courses').doc(courseId).update({
@@ -70,7 +84,8 @@ class CourseController {
         'days': days,
         'files': files,
         'students': students,
-        'canEnroll': canEnroll, // Updating canEnroll in the Firestore document
+        'canEnroll': canEnroll,
+        'isActive': isActive, // NEW: Update isActive in the Firestore document
         'updatedAt': FieldValue.serverTimestamp(),
       });
       print("Course updated successfully");
@@ -125,6 +140,28 @@ class CourseController {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getCoursesForTeacher(
+      String teacherId) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('courses')
+          .where('teacherId', isEqualTo: teacherId)
+          .where('isActive', isEqualTo: true)
+          .get();
+
+      List<Map<String, dynamic>> courses = [];
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id; // تأكد من إضافة id
+        courses.add(data);
+      }
+      return courses;
+    } catch (e) {
+      print("Error fetching courses: $e");
+      return [];
+    }
+  }
+
   // Function to get all courses for a student
   Future<List<Map<String, dynamic>>> getAllCourses() async {
     try {
@@ -138,6 +175,44 @@ class CourseController {
       print("Error fetching courses: $e");
       return [];
     }
+  }
+
+  setStudentData(
+      {required String courseId,
+      required String studentId,
+      required Map<String, String> attendance}) {}
+}
+
+Future<List<Map<String, dynamic>>> getAllActiveCourses() async {
+  try {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    QuerySnapshot snapshot = await firestore
+        .collection('courses')
+        .where('isActive', isEqualTo: true) // NEW: Filter by active status
+        .get();
+
+    List<Map<String, dynamic>> courses = [];
+    for (var doc in snapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      data['id'] = doc.id; // Include document ID
+      courses.add(data);
+    }
+    return courses;
+  } catch (e) {
+    print("Error fetching active courses: $e");
+    return [];
+  }
+}
+
+Future<void> removeStudentFromCourse(String courseId, String studentId) async {
+  try {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    await firestore.collection('courses').doc(courseId).update({
+      'students': FieldValue.arrayRemove([studentId]),
+    });
+    print("Student removed from course successfully");
+  } catch (e) {
+    print("Error removing student: $e");
   }
 }
 
@@ -153,4 +228,46 @@ Future<String> uploadPDF(File file) async {
   } catch (e) {
     throw Exception('Error uploading PDF: $e');
   }
+}
+
+Future<void> setStudentData({
+  required String courseId,
+  required String studentId,
+  Map<String, dynamic>? grades,
+  Map<String, dynamic>? attendance,
+}) async {
+  try {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final docRef = firestore
+        .collection('courses')
+        .doc(courseId)
+        .collection('studentData')
+        .doc(studentId);
+
+    Map<String, dynamic> dataToUpdate = {};
+    if (grades != null) dataToUpdate['grades'] = grades;
+    if (attendance != null) dataToUpdate['attendance'] = attendance;
+
+    await docRef.set(dataToUpdate, SetOptions(merge: true));
+    print("Student data updated successfully");
+  } catch (e) {
+    print("Error updating student data: $e");
+    throw e;
+  }
+}
+
+Future<void> setStudentGrades({
+  required String courseId,
+  required String studentId,
+  required Map<String, Map<String, dynamic>> grades,
+}) async {
+  final docRef = FirebaseFirestore.instance
+      .collection('courses')
+      .doc(courseId)
+      .collection('studentData')
+      .doc(studentId);
+
+  await docRef.set({
+    'grades': grades,
+  }, SetOptions(merge: true));
 }

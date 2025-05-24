@@ -117,11 +117,11 @@ class _DashbordState extends State<Dashbord> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'assets/images/no_courses.png', // Add this asset
-                      width: 200,
-                      height: 200,
-                    ),
+                    // Image.asset(
+                    //   'assets/images/no_courses.png', // Add this asset
+                    //   width: 200,
+                    //   height: 200,
+                    // ),
                     const SizedBox(height: 20),
                     Text(
                       'No Courses Registered',
@@ -137,22 +137,22 @@ class _DashbordState extends State<Dashbord> {
                       style: TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 30),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.search),
-                      label: const Text('Browse Courses'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CoursesScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                      ),
-                    ),
+                    // ElevatedButton.icon(
+                    //   icon: const Icon(Icons.search),
+                    //   label: const Text('Browse Courses'),
+                    //   onPressed: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => const CoursesScreen(),
+                    //       ),
+                    //     );
+                    //   },
+                    //   style: ElevatedButton.styleFrom(
+                    //     padding: const EdgeInsets.symmetric(
+                    //         horizontal: 24, vertical: 12),
+                    //   ),
+                    // ),
                   ],
                 ),
               );

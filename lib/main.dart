@@ -5,12 +5,10 @@ import 'package:smart_academy/admin/feature_admin/authentication_admin/view/logi
 import 'package:smart_academy/admin/feature_admin/authentication_admin/view/register_admin.dart';
 import 'package:smart_academy/admin/feature_admin/authentication_admin/view_model/auth_bloc_admin.dart';
 import 'package:smart_academy/admin/feature_admin/screen_home_admin/view/screen_home_admin.dart';
-
 import 'package:smart_academy/firebase_options.dart';
 import 'package:smart_academy/shared/bloc_observer.dart';
 import 'package:smart_academy/student/feature/chat/room/view/room_screen.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_bloc_teacher.dart';
-
 import 'parent/feature_parent/authentication_parent/view/login_parent.dart';
 import 'parent/feature_parent/authentication_parent/view/register_parent.dart';
 import 'parent/feature_parent/authentication_parent/view_model/bloc_auth_parent.dart';

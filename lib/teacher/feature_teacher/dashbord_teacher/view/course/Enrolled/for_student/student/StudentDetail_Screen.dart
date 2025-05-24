@@ -18,8 +18,10 @@ class StudentDetailScreen extends StatefulWidget {
 
 class _StudentDetailScreenState extends State<StudentDetailScreen> {
   Map<String, dynamic>? studentInfo;
+  Map<String, dynamic> courseData = {};
   double _overallGrade = 0.0;
   int _totalAbsences = 0;
+  List<MapEntry<String, dynamic>> _attendanceEntries = [];
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -45,15 +47,16 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
           .doc(studentId)
           .get();
 
-      final courseData =
+      final courseDataResult =
           await fetchStudentCourseData(studentId, widget.courseId);
 
       if (!mounted) return;
 
       setState(() {
         studentInfo = studentDoc.data();
+        courseData = courseDataResult;
         _processGrades(courseData['grades'] ?? {});
-        _calculateTotalAbsences(courseData['attendance'] ?? {});
+        _processAttendance(courseData['attendance'] ?? {});
         _isLoading = false;
       });
     } catch (e) {
@@ -136,15 +139,410 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
     return '${parsedValue.toStringAsFixed(1)}%';
   }
 
-  void _calculateTotalAbsences(Map<String, dynamic> attendance) {
+  void _processAttendance(Map<String, dynamic> attendance) {
     _totalAbsences = 0;
+    _attendanceEntries.clear();
+
     attendance.forEach((key, value) {
+      _attendanceEntries.add(MapEntry(key, value));
       if (value.toString().toLowerCase() == 'absent' ||
           value.toString().toLowerCase() == 'غائب' ||
           value == false) {
         _totalAbsences++;
       }
     });
+
+    // ترتيب التواريخ من الأحدث إلى الأقدم
+    _attendanceEntries.sort((a, b) => b.key.compareTo(a.key));
+  }
+
+  void _showAddAttendanceDialog(BuildContext context) {
+    DateTime? selectedDate;
+    bool isAbsent = false;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('إضافة سجل حضور',
+            style: TextStyle(fontFamily: 'Tajawal')),
+        content: StatefulBuilder(
+          builder: (context, setDialogState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                    locale: const Locale('ar'),
+                  );
+                  if (pickedDate != null) {
+                    setDialogState(() {
+                      selectedDate = pickedDate;
+                    });
+                  }
+                },
+                child: Text(
+                  selectedDate == null
+                      ? 'اختر التاريخ'
+                      : _formatDate(selectedDate!.toIso8601String()),
+                  style: const TextStyle(
+                      fontFamily: 'Tajawal', color: Colors.blue),
+                ),
+              ),
+              ListTile(
+                title:
+                    const Text('حاضر', style: TextStyle(fontFamily: 'Tajawal')),
+                leading: Radio<bool>(
+                  value: false,
+                  groupValue: isAbsent,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setDialogState(() {
+                        isAbsent = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+              ListTile(
+                title:
+                    const Text('غائب', style: TextStyle(fontFamily: 'Tajawal')),
+                leading: Radio<bool>(
+                  value: true,
+                  groupValue: isAbsent,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setDialogState(() {
+                        isAbsent = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(fontFamily: 'Tajawal')),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (selectedDate == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('يرجى اختيار تاريخ',
+                        style: TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              final timestampKey = selectedDate!.toIso8601String();
+              try {
+                await FirebaseFirestore.instance
+                    .collection('courses')
+                    .doc(widget.courseId)
+                    .collection('studentData')
+                    .doc(widget.student['id'])
+                    .update({
+                  'attendance.$timestampKey': isAbsent ? 'Absent' : 'Present',
+                });
+
+                await _fetchStudentData();
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم إضافة سجل الحضور بنجاح',
+                        style: TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('خطأ أثناء إضافة الحضور: $e',
+                        style: const TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('إضافة', style: TextStyle(fontFamily: 'Tajawal')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteAttendanceDialog(BuildContext context, String timestamp) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title:
+            const Text('تأكيد الحذف', style: TextStyle(fontFamily: 'Tajawal')),
+        content: Text(
+          'هل أنت متأكد من حذف سجل الحضور لتاريخ ${_formatDate(timestamp)}؟',
+          style: const TextStyle(fontFamily: 'Tajawal'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(fontFamily: 'Tajawal')),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                // إنشاء مفتاح آمن لـ Firestore باستبدال النقاط
+                final safeKey = timestamp.replaceAll('.', '_');
+                await FirebaseFirestore.instance
+                    .collection('courses')
+                    .doc(widget.courseId)
+                    .collection('studentData')
+                    .doc(widget.student['id'])
+                    .update({
+                  'attendance.$safeKey': FieldValue.delete(),
+                });
+
+                await _fetchStudentData();
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم حذف سجل الحضور بنجاح',
+                        style: TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('خطأ أثناء حذف الحضور: $e',
+                        style: const TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('تأكيد', style: TextStyle(fontFamily: 'Tajawal')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditGradeDialog(
+      BuildContext context, String gradeKey, dynamic gradeValue) {
+    final scoreController = TextEditingController(
+        text: gradeValue is Map
+            ? gradeValue['score']?.toString() ?? ''
+            : gradeValue.toString());
+    final maxScoreController = TextEditingController(
+        text: gradeValue is Map
+            ? gradeValue['maxScore']?.toString() ?? ''
+            : '100');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('تعديل العلامة: $gradeKey',
+            style: const TextStyle(fontFamily: 'Tajawal')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: scoreController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'الدرجة',
+                hintText: 'أدخل الدرجة',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: maxScoreController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'الدرجة القصوى',
+                hintText: 'أدخل الدرجة القصوى',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(fontFamily: 'Tajawal')),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final score = double.tryParse(scoreController.text);
+              final maxScore = double.tryParse(maxScoreController.text);
+              if (score == null || maxScore == null || maxScore == 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('يرجى إدخال قيم صالحة',
+                        style: TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              try {
+                await FirebaseFirestore.instance
+                    .collection('courses')
+                    .doc(widget.courseId)
+                    .collection('studentData')
+                    .doc(widget.student['id'])
+                    .update({
+                  'grades.$gradeKey': {
+                    'score': score,
+                    'maxScore': maxScore,
+                  },
+                });
+
+                await _fetchStudentData();
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم تعديل العلامة بنجاح',
+                        style: TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('خطأ أثناء تعديل العلامة: $e',
+                        style: const TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('حفظ', style: TextStyle(fontFamily: 'Tajawal')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddGradeDialog(BuildContext context) {
+    final gradeNameController = TextEditingController();
+    final scoreController = TextEditingController();
+    final maxScoreController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('إضافة علامة جديدة',
+            style: TextStyle(fontFamily: 'Tajawal')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: gradeNameController,
+              decoration: const InputDecoration(
+                labelText: 'اسم العلامة',
+                hintText: 'مثال: اختبار 1',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: scoreController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'الدرجة',
+                hintText: 'أدخل الدرجة',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: maxScoreController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'الدرجة القصوى',
+                hintText: 'أدخل الدرجة القصوى',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(fontFamily: 'Tajawal')),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final gradeName = gradeNameController.text.trim();
+              final score = double.tryParse(scoreController.text);
+              final maxScore = double.tryParse(maxScoreController.text);
+
+              if (gradeName.isEmpty ||
+                  score == null ||
+                  maxScore == null ||
+                  maxScore == 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('يرجى إدخال جميع الحقول بقيم صالحة',
+                        style: TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              try {
+                await FirebaseFirestore.instance
+                    .collection('courses')
+                    .doc(widget.courseId)
+                    .collection('studentData')
+                    .doc(widget.student['id'])
+                    .update({
+                  'grades.$gradeName': {
+                    'score': score,
+                    'maxScore': maxScore,
+                  },
+                });
+
+                await _fetchStudentData();
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم إضافة العلامة بنجاح',
+                        style: TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('خطأ أثناء إضافة العلامة: $e',
+                        style: const TextStyle(fontFamily: 'Tajawal')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('إضافة', style: TextStyle(fontFamily: 'Tajawal')),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -273,17 +671,27 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
   }
 
   Widget _buildGradesSection() {
-    final grades = studentInfo?['grades'] ?? {};
+    final grades = courseData['grades'] ?? {};
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('العلامات',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-                fontFamily: 'Tajawal')),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('العلامات',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                    fontFamily: 'Tajawal')),
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.blue),
+              onPressed: () => _showAddGradeDialog(context),
+              tooltip: 'إضافة علامة جديدة',
+            ),
+          ],
+        ),
         const SizedBox(height: 8),
         Card(
           elevation: 2,
@@ -316,51 +724,65 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
                                         fontFamily: 'Tajawal'),
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: _getGradeColor(
-                                        _parseGradeValue(e.value) ?? 0),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    _formatGradeValue(e.value),
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Tajawal'),
-                                  ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: _getGradeColor(
+                                            _parseGradeValue(e.value) ?? 0),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        _formatGradeValue(e.value),
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Tajawal'),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      icon: const Icon(Icons.edit,
+                                          size: 20, color: Colors.blue),
+                                      onPressed: () => _showEditGradeDialog(
+                                          context, e.key, e.value),
+                                      tooltip: 'تعديل العلامة',
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           )),
-                      const Divider(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('المعدل النهائي',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Tajawal')),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: _getGradeColor(_overallGrade),
-                              borderRadius: BorderRadius.circular(20),
+                      if (grades.isNotEmpty) ...[
+                        const Divider(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('المعدل النهائي',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Tajawal')),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: _getGradeColor(_overallGrade),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${_overallGrade.toStringAsFixed(1)}%',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Tajawal'),
+                              ),
                             ),
-                            child: Text(
-                              '${_overallGrade.toStringAsFixed(1)}%',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Tajawal'),
-                            ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
           ),
@@ -370,19 +792,25 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
   }
 
   Widget _buildAttendanceSection() {
-    final attendance = studentInfo?['attendance'] ?? {};
-    final absentDays = attendance.entries.toList();
-    print(absentDays);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('سجل الحضور',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-                fontFamily: 'Tajawal')),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('سجل الحضور',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                    fontFamily: 'Tajawal')),
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.blue),
+              onPressed: () => _showAddAttendanceDialog(context),
+              tooltip: 'إضافة سجل حضور',
+            ),
+          ],
+        ),
         const SizedBox(height: 8),
         Card(
           elevation: 2,
@@ -411,39 +839,161 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                if (absentDays.isEmpty)
+                const SizedBox(height: 16),
+                if (_attendanceEntries.isEmpty)
                   const Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Text('لا توجد سجلات غياب',
-                          style:
-                              TextStyle(fontSize: 16, fontFamily: 'Tajawal')),
+                      child: Column(
+                        children: [
+                          Icon(Icons.check_circle,
+                              color: Colors.green, size: 48),
+                          SizedBox(height: 8),
+                          Text('لا توجد سجلات حضور مسجلة',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Tajawal',
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.w500)),
+                        ],
+                      ),
                     ),
                   )
                 else
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('أيام الغياب',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                              fontFamily: 'Tajawal')),
-                      const SizedBox(height: 8),
-                      ...absentDays.map((e) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.circle,
-                                    color: Colors.red, size: 12),
-                                const SizedBox(width: 8),
-                                Text(_formatDate(e.key),
-                                    style:
-                                        const TextStyle(fontFamily: 'Tajawal')),
-                              ],
-                            ),
-                          )),
+                      Row(
+                        children: [
+                          Icon(Icons.event, color: Colors.blue, size: 20),
+                          const SizedBox(width: 8),
+                          const Text('سجلات الحضور',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.blue,
+                                  fontFamily: 'Tajawal')),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Column(
+                          children: _attendanceEntries
+                              .map((entry) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey.shade200,
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          entry.value
+                                                          .toString()
+                                                          .toLowerCase() ==
+                                                      'absent' ||
+                                                  entry.value
+                                                          .toString()
+                                                          .toLowerCase() ==
+                                                      'غائب' ||
+                                                  entry.value == false
+                                              ? Icons.event_busy
+                                              : Icons.event_available,
+                                          color: entry.value
+                                                          .toString()
+                                                          .toLowerCase() ==
+                                                      'absent' ||
+                                                  entry.value
+                                                          .toString()
+                                                          .toLowerCase() ==
+                                                      'غائب' ||
+                                                  entry.value == false
+                                              ? Colors.red.shade600
+                                              : Colors.green.shade600,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            _formatDate(entry.key),
+                                            style: TextStyle(
+                                                fontFamily: 'Tajawal',
+                                                fontSize: 15,
+                                                color: entry.value
+                                                                .toString()
+                                                                .toLowerCase() ==
+                                                            'absent' ||
+                                                        entry.value
+                                                                .toString()
+                                                                .toLowerCase() ==
+                                                            'غائب' ||
+                                                        entry.value == false
+                                                    ? Colors.red.shade700
+                                                    : Colors.green.shade700),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: entry
+                                                            .value
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'absent' ||
+                                                    entry.value
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'غائب' ||
+                                                    entry.value == false
+                                                ? Colors.red.shade600
+                                                : Colors.green.shade600,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            entry.value
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'absent' ||
+                                                    entry.value
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'غائب' ||
+                                                    entry.value == false
+                                                ? 'غائب'
+                                                : 'حاضر',
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                fontFamily: 'Tajawal'),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete,
+                                              size: 18, color: Colors.red),
+                                          onPressed: () =>
+                                              _showDeleteAttendanceDialog(
+                                                  context, entry.key),
+                                          tooltip: 'حذف سجل الحضور',
+                                        ),
+                                      ],
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
                     ],
                   ),
               ],
@@ -493,12 +1043,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
     );
   }
 
-  String _formatDate(String dateStr) {
+  String _formatDate(String timestamp) {
     try {
-      final date = DateTime.parse(dateStr);
-      return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final date = DateTime.parse(timestamp);
+      final formatter = DateFormat('EEEE، d MMMM yyyy', 'ar');
+      return formatter.format(date);
     } catch (e) {
-      return dateStr.length >= 10 ? dateStr.substring(0, 10) : dateStr;
+      return timestamp.length >= 10 ? timestamp.substring(0, 10) : timestamp;
     }
   }
 

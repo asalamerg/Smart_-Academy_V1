@@ -66,62 +66,36 @@ class _DashbordState extends State<Dashbord> {
           ),
         ),
         padding: const EdgeInsets.all(16),
-        child: StreamBuilder<QuerySnapshot>(
+        child: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
               .collection('user')
-              .doc(user!.uid)
-              .collection('courses')
+              .doc(user!.uid) // Get the user document
               .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+          builder: (context, userSnapshot) {
+            if (userSnapshot.connectionState == ConnectionState.waiting) {
               return const Center(
-                child: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                  ),
-                ),
+                child: CircularProgressIndicator(),
               );
             }
 
-            if (snapshot.hasError) {
+            if (userSnapshot.hasError) {
+              return Center(
+                child: Text('Error: ${userSnapshot.error}'),
+              );
+            }
+
+            if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+              return const Center(child: Text('User not found.'));
+            }
+
+            final userData = userSnapshot.data!.data() as Map<String, dynamic>;
+            final courseIds = List<String>.from(userData['courses'] ?? []);
+
+            if (courseIds.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 50, color: Colors.red[300]),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Failed to load courses',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Please check your connection and try again',
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () => setState(() {}),
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Image.asset(
-                    //   'assets/images/no_courses.png', // Add this asset
-                    //   width: 200,
-                    //   height: 200,
-                    // ),
                     const SizedBox(height: 20),
                     Text(
                       'No Courses Registered',
@@ -137,69 +111,68 @@ class _DashbordState extends State<Dashbord> {
                       style: TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 30),
-                    // ElevatedButton.icon(
-                    //   icon: const Icon(Icons.search),
-                    //   label: const Text('Browse Courses'),
-                    //   onPressed: () {
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (context) => const CoursesScreen(),
-                    //       ),
-                    //     );
-                    //   },
-                    //   style: ElevatedButton.styleFrom(
-                    //     padding: const EdgeInsets.symmetric(
-                    //         horizontal: 24, vertical: 12),
-                    //   ),
-                    // ),
                   ],
                 ),
               );
             }
 
-            final courses = snapshot.data!.docs;
+            return StreamBuilder<List<DocumentSnapshot>>(
+              stream: FirebaseFirestore.instance
+                  .collection('courses')
+                  .where(FieldPath.documentId, whereIn: courseIds)
+                  .snapshots()
+                  .map((querySnapshot) =>
+                      querySnapshot.docs) // Get all course documents
+              ,
+              builder: (context, courseSnapshot) {
+                if (courseSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-            return RefreshIndicator(
-              onRefresh: () async {
-                setState(() {});
-                await Future.delayed(const Duration(seconds: 1));
-              },
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.9,
-                ),
-                itemCount: courses.length,
-                itemBuilder: (context, index) {
-                  final courseDoc = courses[index];
-                  final courseId = courseDoc.id;
+                if (courseSnapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${courseSnapshot.error}'),
+                  );
+                }
 
-                  return FutureBuilder<DocumentSnapshot>(
-                    future: FirebaseFirestore.instance
-                        .collection('courses')
-                        .doc(courseId)
-                        .get(),
-                    builder: (context, courseSnapshot) {
-                      if (courseSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2));
-                      }
+                if (!courseSnapshot.hasData || courseSnapshot.data!.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline,
+                            size: 50, color: Colors.red),
+                        const SizedBox(height: 20),
+                        Text('No courses found.'),
+                      ],
+                    ),
+                  );
+                }
 
-                      if (!courseSnapshot.hasData ||
-                          !courseSnapshot.data!.exists) {
-                        return _buildErrorCard();
-                      }
+                final courses = courseSnapshot.data!;
 
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    setState(() {});
+                    await Future.delayed(const Duration(seconds: 1));
+                  },
+                  child: GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.9,
+                    ),
+                    itemCount: courses.length,
+                    itemBuilder: (context, index) {
                       final courseData =
-                          courseSnapshot.data!.data() as Map<String, dynamic>;
-
+                          courses[index].data() as Map<String, dynamic>;
+                      final courseId = courses[index].id;
                       final courseName = courseData['name'] ?? 'Unnamed Course';
                       final courseCode = courseData['courseCode'] ?? 'No Code';
-                      final courseColor = _getCourseColor(index);
 
                       return InkWell(
                         borderRadius: BorderRadius.circular(16),
@@ -209,6 +182,7 @@ class _DashbordState extends State<Dashbord> {
                             MaterialPageRoute(
                               builder: (_) => CourseDetailWithGradesScreen(
                                 courseId: courseId,
+                                studentId: user!.uid,
                               ),
                             ),
                           );
@@ -225,8 +199,8 @@ class _DashbordState extends State<Dashbord> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  courseColor.withOpacity(0.8),
-                                  courseColor.withOpacity(0.4),
+                                  Colors.blue.withOpacity(0.8),
+                                  Colors.blue.withOpacity(0.4),
                                 ],
                               ),
                             ),
@@ -237,18 +211,8 @@ class _DashbordState extends State<Dashbord> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Icon(
-                                      _getCourseIcon(index),
-                                      size: 30,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                  Icon(Icons.school,
+                                      size: 30, color: Colors.white),
                                   const Spacer(),
                                   Text(
                                     courseName,
@@ -275,9 +239,9 @@ class _DashbordState extends State<Dashbord> {
                         ),
                       );
                     },
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             );
           },
         ),
@@ -300,55 +264,5 @@ class _DashbordState extends State<Dashbord> {
         ),
       ),
     );
-  }
-
-  Widget _buildErrorCard() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 40, color: Colors.red[300]),
-            const SizedBox(height: 10),
-            const Text(
-              'Course data not available',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _getCourseColor(int index) {
-    final colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.teal,
-      Colors.indigo,
-      Colors.pink,
-    ];
-    return colors[index % colors.length];
-  }
-
-  IconData _getCourseIcon(int index) {
-    final icons = [
-      Icons.school,
-      Icons.computer,
-      Icons.calculate,
-      Icons.science,
-      Icons.language,
-      Icons.history,
-      Icons.art_track,
-    ];
-    return icons[index % icons.length];
   }
 }

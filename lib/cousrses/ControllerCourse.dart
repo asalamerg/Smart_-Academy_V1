@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/model/model_teacher.dart';
 import 'dart:io';
+import 'package:uuid/uuid.dart';
 
 class CourseController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -18,9 +19,10 @@ class CourseController {
     required String endTime,
     required List<String> days,
     required List<String> files,
-    required List<String> students,
+    // required List<String> students,
     bool isActive = true,
-    required bool canEnroll, // Add canEnroll as a parameter
+    bool isdelet = false,
+    required bool canEnroll,
   }) async {
     try {
       await _firestore.collection('courses').add({
@@ -33,11 +35,12 @@ class CourseController {
         'endTime': endTime,
         'days': days,
         'files': files,
-        'students': students,
+        // 'students': students,
         'teacherId': teacher.id,
         'createdAt': FieldValue.serverTimestamp(),
         'canEnroll': canEnroll,
         'isActive': isActive,
+        'isdelet': isdelet,
       });
       print("Course added successfully");
     } catch (e) {
@@ -45,6 +48,75 @@ class CourseController {
     }
   }
 
+  // Function to save grades to student data
+  Future<void> saveGradesToStudentData({
+    required String courseId,
+    required String examName,
+    required int maxGrade,
+    required Map<String, dynamic> grades, // map studentId -> grade (int)
+  }) async {
+    final firestore = FirebaseFirestore.instance;
+
+    try {
+      // لكل طالب في grades، حدّث وثيقة الطالب
+      for (var entry in grades.entries) {
+        final studentId = entry.key;
+        final grade = entry.value;
+
+        final docRef = firestore
+            .collection('courses')
+            .doc(courseId)
+            .collection('studentData')
+            .doc(studentId);
+
+        // إضافة أو تحديث الدرجات الخاصة بالامتحان
+        await docRef.set({
+          'grades': {
+            examName: {
+              'grade': grade,
+              'maxGrade': maxGrade,
+            }
+          }
+        }, SetOptions(merge: true)); // استخدام merge لتحديث البيانات دون مسحها
+
+        print("Grade saved for student: $studentId");
+      }
+
+      print('Grades saved to studentData successfully');
+    } catch (e) {
+      print('Error saving grades to studentData: $e');
+      throw e;
+    }
+  }
+
+  // Function to save grade for a student (alternative for adding grades to exams)
+  Future<void> saveGradeForStudent({
+    required String courseId,
+    required String studentId,
+    required String examName,
+    required int maxGrade,
+    required int grade,
+  }) async {
+    try {
+      await _firestore
+          .collection('courses') // collection الخاصة بالمواد
+          .doc(courseId) // id للمادة
+          .collection('studentData') // collection الخاصة ببيانات الطلاب
+          .doc(studentId) // id الطالب
+          .collection('grades') // collection الخاصة بالعلامات
+          .add({
+        'examName': examName,
+        'maxGrade': maxGrade,
+        'grade': grade,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      print("Grade saved for student: $studentId");
+    } catch (e) {
+      throw Exception("Failed to save grade: $e");
+    }
+  }
+
+  // Function to toggle course active status
   Future<void> toggleCourseActiveStatus(String courseId, bool isActive) async {
     try {
       await _firestore.collection('courses').doc(courseId).update({
@@ -70,7 +142,7 @@ class CourseController {
     required List<String> files,
     required List<String> students,
     required bool canEnroll,
-    required bool isActive, // NEW: Added isActive parameter
+    required bool isActive,
   }) async {
     try {
       await _firestore.collection('courses').doc(courseId).update({
@@ -85,7 +157,7 @@ class CourseController {
         'files': files,
         'students': students,
         'canEnroll': canEnroll,
-        'isActive': isActive, // NEW: Update isActive in the Firestore document
+        'isActive': isActive,
         'updatedAt': FieldValue.serverTimestamp(),
       });
       print("Course updated successfully");
@@ -97,35 +169,53 @@ class CourseController {
   // Function to delete a course from Firestore
   Future<void> deleteCourse(String courseId) async {
     try {
-      await _firestore.collection('courses').doc(courseId).delete();
-      print("Course deleted successfully");
+      // Step 1: Get all students enrolled in the course and remove the courseId
+      final snapshot = await _firestore
+          .collection('user')
+          .where('courses',
+              arrayContains: courseId) // Find students enrolled in this course
+          .get();
+
+      for (var studentDoc in snapshot.docs) {
+        // Remove the courseId from each student's courses list
+        await _firestore.collection('user').doc(studentDoc.id).update({
+          'courses': FieldValue.arrayRemove([courseId]),
+        });
+        print("Course removed from student: ${studentDoc.id}");
+      }
+
+      // Step 2: Set 'isdelet' to true instead of deleting the course
+      await _firestore.collection('courses').doc(courseId).update({
+        'isdelet': true,
+      });
+
+      print("Course marked as deleted (isdelet = true)");
     } catch (e) {
       print("Error deleting course: $e");
     }
   }
 
   // Function to enroll a student in a course
-  Future<void> enrollStudentInCourse(String courseId, String studentId) async {
-    try {
-      // Check if the course allows enrollment
-      DocumentSnapshot courseDoc =
-          await _firestore.collection('courses').doc(courseId).get();
-      if (courseDoc.exists) {
-        bool canEnroll = courseDoc['canEnroll'] ?? false;
-        if (!canEnroll) {
-          print("Enrollment is closed for this course.");
-          return;
-        }
-      }
+  // Future<void> enrollStudentInCourse(String courseId, String studentId) async {
+  //   try {
+  //     DocumentSnapshot courseDoc =
+  //         await _firestore.collection('courses').doc(courseId).get();
+  //     if (courseDoc.exists) {
+  //       bool canEnroll = courseDoc['canEnroll'] ?? false;
+  //       if (!canEnroll) {
+  //         print("Enrollment is closed for this course.");
+  //         return;
+  //       }
+  //     }
 
-      await _firestore.collection('courses').doc(courseId).update({
-        'students': FieldValue.arrayUnion([studentId]),
-      });
-      print("Student enrolled successfully");
-    } catch (e) {
-      print("Error enrolling student: $e");
-    }
-  }
+  //     await _firestore.collection('courses').doc(courseId).update({
+  //       'students': FieldValue.arrayUnion([studentId]),
+  //     });
+  //     print("Student enrolled successfully");
+  //   } catch (e) {
+  //     print("Error enrolling student: $e");
+  //   }
+  // }
 
   // Function to remove a student from a course
   Future<void> removeStudentFromCourse(
@@ -140,19 +230,21 @@ class CourseController {
     }
   }
 
+  // Function to get courses for a teacher
   Future<List<Map<String, dynamic>>> getCoursesForTeacher(
       String teacherId) async {
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final snapshot = await _firestore
           .collection('courses')
           .where('teacherId', isEqualTo: teacherId)
           .where('isActive', isEqualTo: true)
+          .where('isdelet', isEqualTo: false)
           .get();
 
       List<Map<String, dynamic>> courses = [];
       for (var doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id; // تأكد من إضافة id
+        data['id'] = doc.id;
         courses.add(data);
       }
       return courses;
@@ -162,7 +254,7 @@ class CourseController {
     }
   }
 
-  // Function to get all courses for a student
+  // Function to get all courses
   Future<List<Map<String, dynamic>>> getAllCourses() async {
     try {
       QuerySnapshot snapshot = await _firestore.collection('courses').get();
@@ -177,97 +269,18 @@ class CourseController {
     }
   }
 
-  setStudentData(
-      {required String courseId,
-      required String studentId,
-      required Map<String, String> attendance}) {}
-}
-
-Future<List<Map<String, dynamic>>> getAllActiveCourses() async {
-  try {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    QuerySnapshot snapshot = await firestore
-        .collection('courses')
-        .where('isActive', isEqualTo: true) // NEW: Filter by active status
-        .get();
-
-    List<Map<String, dynamic>> courses = [];
-    for (var doc in snapshot.docs) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      data['id'] = doc.id; // Include document ID
-      courses.add(data);
+  // Function to upload a PDF to Firebase Storage
+  Future<String> uploadPDF(File file) async {
+    try {
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference storageRef =
+          FirebaseStorage.instance.ref().child('course_pdfs/$fileName.pdf');
+      UploadTask uploadTask = storageRef.putFile(file);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      throw Exception('Error uploading PDF: $e');
     }
-    return courses;
-  } catch (e) {
-    print("Error fetching active courses: $e");
-    return [];
   }
-}
-
-Future<void> removeStudentFromCourse(String courseId, String studentId) async {
-  try {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    await firestore.collection('courses').doc(courseId).update({
-      'students': FieldValue.arrayRemove([studentId]),
-    });
-    print("Student removed from course successfully");
-  } catch (e) {
-    print("Error removing student: $e");
-  }
-}
-
-Future<String> uploadPDF(File file) async {
-  try {
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    Reference storageRef =
-        FirebaseStorage.instance.ref().child('course_pdfs/$fileName.pdf');
-    UploadTask uploadTask = storageRef.putFile(file);
-    TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-    String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-    return downloadUrl;
-  } catch (e) {
-    throw Exception('Error uploading PDF: $e');
-  }
-}
-
-Future<void> setStudentData({
-  required String courseId,
-  required String studentId,
-  Map<String, dynamic>? grades,
-  Map<String, dynamic>? attendance,
-}) async {
-  try {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final docRef = firestore
-        .collection('courses')
-        .doc(courseId)
-        .collection('studentData')
-        .doc(studentId);
-
-    Map<String, dynamic> dataToUpdate = {};
-    if (grades != null) dataToUpdate['grades'] = grades;
-    if (attendance != null) dataToUpdate['attendance'] = attendance;
-
-    await docRef.set(dataToUpdate, SetOptions(merge: true));
-    print("Student data updated successfully");
-  } catch (e) {
-    print("Error updating student data: $e");
-    throw e;
-  }
-}
-
-Future<void> setStudentGrades({
-  required String courseId,
-  required String studentId,
-  required Map<String, Map<String, dynamic>> grades,
-}) async {
-  final docRef = FirebaseFirestore.instance
-      .collection('courses')
-      .doc(courseId)
-      .collection('studentData')
-      .doc(studentId);
-
-  await docRef.set({
-    'grades': grades,
-  }, SetOptions(merge: true));
 }

@@ -1,4 +1,3 @@
-
 // class ModelParent {
 //   String id;
 //   String name;
@@ -48,12 +47,12 @@ class ModelParent {
   });
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "email": email,
-    "numberId": numberId,
-    "linkedStudentUid": linkedStudentUid,
-  };
+        "id": id,
+        "name": name,
+        "email": email,
+        "numberId": numberId,
+        "linkedStudentUid": linkedStudentUid,
+      };
 
   ModelParent.fromJson(Map<String, dynamic> json)
       : id = json['id'],

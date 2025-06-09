@@ -226,49 +226,92 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     if (user != null) {
       final studentId = user.uid;
 
+      // Check if the student is already enrolled in this course
       final studentCourseDoc = await FirebaseFirestore.instance
-          .collection('user')
-          .doc(studentId)
           .collection('courses')
           .doc(courseId)
+          .collection('studentData')
+          .doc(studentId)
           .get();
 
       if (studentCourseDoc.exists) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('أنت مسجل مسبقاً في هذه الدورة.')),
+          const SnackBar(
+              content: Text('You are already enrolled in this course.')),
         );
         return;
       }
 
+      // Add the student to the 'studentData' collection of the course
       await FirebaseFirestore.instance
           .collection('courses')
           .doc(courseId)
-          .update({
-        'students': FieldValue.arrayUnion([studentId]),
+          .collection('studentData')
+          .doc(studentId) // Store the student data in a subcollection
+          .set({
+        // Add other student-specific data here if needed
       });
 
-      final studentCoursesRef = FirebaseFirestore.instance
+      // Add the courseId to the student's 'courses' array in the user document
+      await FirebaseFirestore.instance
           .collection('user')
           .doc(studentId)
-          .collection('courses')
-          .doc(courseId);
-
-      await studentCoursesRef.set({
-        'enrolledAt': FieldValue.serverTimestamp(),
-        'attendanceDays': [],
-        'Marks': [],
+          .update({
+        'courses':
+            FieldValue.arrayUnion([courseId]), // Add courseId to the array
       });
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم التسجيل في الدورة بنجاح!')),
+        const SnackBar(content: Text('Successfully enrolled in the course!')),
       );
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء تسجيل الدخول للتسجيل في الدورة.')),
+        const SnackBar(content: Text('Please log in to enroll in the course.')),
       );
     }
   }
+
+  // Future<void> _enrollStudent1(String courseId) async {
+  //   final user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     final studentId = user.uid;
+
+  //     // Check if the student is already enrolled in this course
+  //     final studentCourseDoc = await FirebaseFirestore.instance
+  //         .collection('courses')
+  //         .doc(courseId)
+  //         .collection('studentData')
+  //         .doc(studentId)
+  //         .get();
+
+  //     if (studentCourseDoc.exists) {
+  //       if (!mounted) return;
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //             content: Text('You are already enrolled in this course.')),
+  //       );
+  //       return;
+  //     }
+
+  //     // Add the student to the 'studentData' collection of the course
+  //     await FirebaseFirestore.instance
+  //         .collection('courses')
+  //         .doc(courseId)
+  //         .collection('studentData')
+  //         .doc(studentId); // Store the student data in a subcollection
+
+  //     if (!mounted) return;
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Successfully enrolled in the course!')),
+  //     );
+  //   } else {
+  //     if (!mounted) return;
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Please log in to enroll in the course.')),
+  //     );
+  //   }
+  // }
 }

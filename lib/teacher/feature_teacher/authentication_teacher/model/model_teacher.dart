@@ -14,7 +14,7 @@ class ModelTeacher {
     required this.numberId,
   });
 
-  // تحويل الكائن إلى JSON ليتم تخزينه في قاعدة البيانات أو استخدامه في الشبكات
+  // Convert the object to JSON for storing in the database or network use
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -24,10 +24,12 @@ class ModelTeacher {
     };
   }
 
-  // تحويل JSON إلى كائن ModelTeacher
+  // Convert JSON to a ModelTeacher object
   ModelTeacher.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         name = json['name'],
         email = json['email'],
         numberId = json['numberId'];
+
+  // Method to update teacher details
 }

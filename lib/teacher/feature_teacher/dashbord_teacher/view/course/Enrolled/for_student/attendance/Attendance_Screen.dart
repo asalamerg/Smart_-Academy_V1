@@ -23,24 +23,27 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
+  // دالة لحفظ أيام الغياب فقط
   Future<void> saveAttendance() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+    // حفظ الحضور فقط للطلاب الغائبين
     for (var entry in attendance.entries) {
       final studentId = entry.key;
       final isPresent = entry.value;
 
-      // Save only if the student is absent
+      // قم بحفظ الحضور فقط إذا كان الطالب غائبًا
       if (!isPresent) {
         await firestore
             .collection('courses')
             .doc(widget.courseId)
             .collection('studentData')
             .doc(studentId)
-            .collection('absences')
-            .add({
-          'date': DateTime.now().toIso8601String(),
-        });
+            .set({
+          'attendance': {
+            DateTime.now().toIso8601String(): 'Absent', // حفظ الغياب
+          }
+        }, SetOptions(merge: true));
       }
     }
   }
@@ -83,7 +86,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          await saveAttendance();
+          await saveAttendance(); // حفظ البيانات
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Attendance saved successfully')),
           );

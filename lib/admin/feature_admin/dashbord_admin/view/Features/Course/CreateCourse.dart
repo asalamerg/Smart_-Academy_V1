@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:smart_academy/cousrses/ControllerCourse.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/model/model_teacher.dart';
+import 'package:smart_academy/teacher/feature_teacher/controller/teacher.dart';
+import 'SelectTeacherScreen.dart';
 
-class AddCourseScreen extends StatefulWidget {
-  final ModelTeacher teacher;
-
-  const AddCourseScreen({super.key, required this.teacher});
+class CreateCourseScreen extends StatefulWidget {
+  const CreateCourseScreen({super.key});
 
   @override
-  _AddCourseScreenState createState() => _AddCourseScreenState();
+  _CreateCourseScreenState createState() => _CreateCourseScreenState();
 }
 
-class _AddCourseScreenState extends State<AddCourseScreen> {
+class _CreateCourseScreenState extends State<CreateCourseScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController startTimeController = TextEditingController();
   final TextEditingController endTimeController = TextEditingController();
   final TextEditingController capacityController = TextEditingController();
   final TextEditingController courseCodeController = TextEditingController();
   List<String> selectedDays = [];
-  bool canEnroll = true; // Default value for canEnroll
+  bool canEnroll = true;
   final List<String> daysOfWeek = [
     "Monday",
     "Tuesday",
@@ -30,8 +31,35 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
   ];
 
   CourseController _courseController = CourseController();
+  TeacherController _teacherController = TeacherController();
 
-  // Save the course
+  String? _selectedTeacherId;
+  List<Map<String, dynamic>> _teachers = [];
+
+  Future<void> _fetchTeachers() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('teacher').get();
+      setState(() {
+        _teachers = snapshot.docs.map((doc) {
+          return {
+            'id': doc.id,
+            'name': doc['name'],
+            'email': doc['email'],
+          };
+        }).toList();
+      });
+    } catch (e) {
+      print("Error fetching teachers: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTeachers();
+  }
+
   void _saveCourse() async {
     final name = nameController.text.trim();
     final start = startTimeController.text.trim();
@@ -40,48 +68,51 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
     final courseCode = courseCodeController.text.trim();
     bool isActive = true;
     bool canEnroll = true;
-    bool isdelet = false;
 
-    // Example file URLs
     List<String> files = ['https://example.com/file1.pdf'];
-
-    // List of students (empty initially)
-    List<String> students = [];
+    // List<String> students = [];
 
     if (name.isNotEmpty &&
         start.isNotEmpty &&
         end.isNotEmpty &&
         selectedDays.isNotEmpty &&
-        courseCode.isNotEmpty) {
-      await _courseController.addCourse(
-        teacher: widget.teacher,
-        name: name,
-        description: 'Course description goes here',
-        pdfUrl: 'https://example.com/sample.pdf',
-        courseCode: courseCode,
-        maxStudents: capacity,
-        startTime: start,
-        endTime: end,
-        days: selectedDays,
-        files: files,
-        // students: students, // List of students
-        canEnroll: canEnroll, // Add canEnroll to the course
-        isActive: isActive,
-      );
-
-      Navigator.pop(context); // Go back after saving
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Course Saved!')));
+        courseCode.isNotEmpty &&
+        _selectedTeacherId != null) {
+      try {
+        ModelTeacher teacher =
+            await _teacherController.getTeacherById(_selectedTeacherId!);
+        await _courseController.addCourse(
+          teacher: teacher,
+          name: name,
+          description: 'Course description goes here',
+          pdfUrl: 'https://example.com/sample.pdf',
+          courseCode: courseCode,
+          maxStudents: capacity,
+          startTime: start,
+          endTime: end,
+          days: selectedDays,
+          files: files,
+          // students: students,
+          canEnroll: canEnroll,
+          isActive: isActive,
+        );
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Course Saved!')));
+      } catch (e) {
+        print('Error fetching teacher or saving course: $e');
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Set the background color to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Add New Course"),
+        title: Text("Create New Course"),
         backgroundColor: Colors.blue,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -89,37 +120,65 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Course Name Field
+              // Teacher Selection Button
+              ElevatedButton(
+                onPressed: () async {
+                  final teacherId = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SelectTeacherScreen(),
+                    ),
+                  );
+                  if (teacherId != null) {
+                    setState(() {
+                      _selectedTeacherId = teacherId;
+                    });
+                  }
+                },
+                child: Text(
+                  _selectedTeacherId == null
+                      ? "Select Teacher"
+                      : "Teacher Selected",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Course Fields
               _buildTextField(nameController, "Course Name", Icons.book),
-
-              // Course Code Field
               _buildTextField(courseCodeController, "Course Code", Icons.code),
-
-              // Start Time Field
               _buildTextField(
                   startTimeController, "Start Time (HH:mm)", Icons.access_time),
-
-              // End Time Field
               _buildTextField(
                   endTimeController, "End Time (HH:mm)", Icons.access_time),
-
-              // Capacity Field
               _buildTextField(capacityController, "Capacity", Icons.people),
+
+              const SizedBox(height: 16),
 
               // Days Selection
               _buildDaysSelection(),
-
-              // Can Enroll Toggle
               _buildCanEnrollSwitch(),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
+              // Save Course Button
               ElevatedButton(
                 onPressed: _saveCourse,
                 child: Text("Save Course"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
               ),
             ],
@@ -182,12 +241,8 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Text(
-            "Allow Students to Enroll",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-
-          // zx
+          Text("Allow Students to Enroll",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           Switch(
             value: canEnroll,
             onChanged: (value) {

@@ -404,37 +404,63 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () async {
+                          // Show confirmation dialog
                           final confirmDelete = await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Delete Course'),
                               content: const Text(
-                                  'Are you sure you want to delete this course?'),
+                                  'Are you sure you want to mark this course as deleted?'),
                               actions: [
                                 TextButton(
                                   onPressed: () =>
-                                      Navigator.pop(context, false),
+                                      Navigator.pop(context, false), // Cancel
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
+                                  onPressed: () => Navigator.pop(
+                                      context, true), // Confirm Delete
                                   child: const Text('Delete'),
                                 ),
                               ],
                             ),
                           );
 
+                          // If user confirms, update the course status to 'isdelet = true' instead of deleting
                           if (confirmDelete == true) {
-                            await FirebaseFirestore.instance
-                                .collection('courses')
-                                .doc(widget.courseId)
-                                .delete();
+                            try {
+                              // Mark the course as deleted (isdelet = true)
+                              await FirebaseFirestore.instance
+                                  .collection('courses')
+                                  .doc(widget.courseId)
+                                  .update({
+                                'isdelet': true, // Mark the course as deleted
+                              });
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Course deleted successfully')),
-                            );
-                            Navigator.pop(context);
+                              // Optionally, remove the course from students' course list
+                              // await _removeCourseFromStudents();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Course marked as deleted successfully')),
+                              );
+
+                              // Go back to the previous screen after marking the course as deleted
+                              Navigator.pop(context);
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Error marking course as deleted: $e'),
+                                  backgroundColor: Colors.red,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              );
+                            }
                           }
                         },
                         icon: const Icon(Icons.delete, color: Colors.white),
@@ -444,7 +470,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           side: const BorderSide(color: Colors.red),
                         ),
                       ),

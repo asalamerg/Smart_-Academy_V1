@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../../../../cousrses/ControllerCourse.dart';
+
 class GradesScreen extends StatefulWidget {
   final List<Map<String, dynamic>> students;
   final String courseId;
@@ -38,7 +40,7 @@ class _GradesScreenState extends State<GradesScreen> {
 
   Future<void> saveGrades() async {
     final examName = examNameController.text.trim();
-    final maxGrade = maxGradeController.text.trim();
+    final maxGradeText = maxGradeController.text.trim();
 
     if (examName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,28 +49,65 @@ class _GradesScreenState extends State<GradesScreen> {
       return;
     }
 
-    if (maxGrade.isEmpty) {
+    if (maxGradeText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter the maximum grade')),
       );
       return;
     }
 
-    Map<String, String> grades = {};
+    final maxGrade = int.tryParse(maxGradeText);
+    if (maxGrade == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Maximum grade must be a number')),
+      );
+      return;
+    }
+
+    Map<String, dynamic> grades = {};
+    bool hasInvalidGrade = false;
+
     studentGradeControllers.forEach((studentId, controller) {
-      grades[studentId] = controller.text.trim();
+      final gradeText = controller.text.trim();
+      final grade = int.tryParse(gradeText);
+
+      if (grade == null && gradeText.isNotEmpty) {
+        hasInvalidGrade = true;
+        return;
+      }
+
+      grades[studentId] = grade ?? 0;
     });
 
-    // هنا يمكنك حفظ اسم الامتحان والدرجة القصوى مع درجات الطلاب في Firestore
-    print('Exam Name: $examName');
-    print('Max Grade: $maxGrade');
-    print('Grades: $grades');
+    if (hasInvalidGrade) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Please enter valid numeric grades for all students')),
+      );
+      return;
+    }
 
-    // بعد الحفظ في قاعدة البيانات
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Grades saved successfully')),
-    );
-    Navigator.pop(context);
+    try {
+      final controller = CourseController();
+
+      await controller.saveGradesToStudentData(
+        courseId: widget.courseId,
+        examName: examName,
+        maxGrade: maxGrade,
+        grades: grades,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Grades saved successfully')),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save grades: $e')),
+      );
+    }
   }
 
   @override
@@ -121,7 +160,7 @@ class _GradesScreenState extends State<GradesScreen> {
                         child: TextField(
                           controller: studentGradeControllers[studentId],
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Grade',
                             border: OutlineInputBorder(),
                           ),

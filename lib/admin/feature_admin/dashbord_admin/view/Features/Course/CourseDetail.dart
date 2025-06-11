@@ -63,6 +63,56 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   }
 
   Future<void> _deleteCourse(BuildContext context) async {
+    try {
+      // Step 1: Delete the course from the `courses` collection
+      await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(widget.courseId)
+          .update({
+        'isDeleted': true, // Mark the course as deleted
+      });
+
+      print("Course deleted successfully");
+
+      // Step 2: Remove the course from students' course list
+      await _removeCourseFromStudents();
+
+      // Show success message before navigation
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Course deleted successfully'),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+
+      // Step 3: Navigate back after a short delay to allow SnackBar to show
+      if (mounted) {
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) Navigator.pop(context);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting course: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteCourse1(BuildContext context) async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -83,7 +133,10 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                   await FirebaseFirestore.instance
                       .collection('courses')
                       .doc(widget.courseId)
-                      .delete();
+                      .update({
+                    'isDeleted': true, // Mark the course as deleted
+                  });
+
                   print("Course deleted successfully");
 
                   // Step 2: Remove the course from students' course list
@@ -101,7 +154,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
                   // Step 3: Navigate back to the previous screen (only if widget is mounted)
                   if (mounted) {
-                    Navigator.pop(context); // Go back to the previous screen
+                    // Navigator.pop(context); // Go back to the previous screen
                   }
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(

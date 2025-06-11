@@ -71,7 +71,10 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         centerTitle: true,
         title: Text(
           "Login",
-          style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold,),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),

@@ -28,6 +28,8 @@ class CoursesScreen extends StatelessWidget {
           stream: FirebaseFirestore.instance
               .collection('courses')
               .where('canEnroll', isEqualTo: true) // Filter by canEnroll field
+              .where('isdelet',
+                  isEqualTo: false) // Ensure courses are not deleted
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

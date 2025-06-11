@@ -243,6 +243,8 @@ class _RegisterState extends State<Register> {
                           );
                         },
                       ),
+                      const SizedBox(height: 16),
+                      // Add Google sign-in button
                     ],
                   ),
                 ),

@@ -69,7 +69,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           .collection('courses')
           .doc(widget.courseId)
           .update({
-        'isDeleted': true, // Mark the course as deleted
+        'isdelet': true, // Mark the course as deleted
       });
 
       print("Course deleted successfully");

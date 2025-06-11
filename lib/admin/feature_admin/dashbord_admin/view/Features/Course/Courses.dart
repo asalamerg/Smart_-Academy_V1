@@ -53,6 +53,10 @@ class _CoursesScreenState extends State<CoursesScreen> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('courses')
+                    .where(
+                      'isdelet',
+                      isEqualTo: false,
+                    )
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

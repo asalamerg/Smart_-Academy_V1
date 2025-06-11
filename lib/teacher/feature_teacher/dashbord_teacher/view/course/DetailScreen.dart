@@ -180,6 +180,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           final endTime = courseData['endTime'] ?? 'Not specified';
           final courseDays = List<String>.from(courseData['days'] ?? []);
           final students = List<String>.from(courseData['students'] ?? []);
+
           final canEnroll = courseData['canEnroll'] ?? false;
           final studentsIds = List<dynamic>.from(courseData['students'] ?? []);
           final studentNamesFuture = fetchStudentNames(studentsIds);
@@ -349,14 +350,14 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => EnrolledStudentsScreen(
-                          students: studentsList,
+                          // students: studentsList,
                           courseId: widget.courseId,
                         ),
                       ),
                     );
                   },
                   icon: const Icon(Icons.people),
-                  label: Text('View Enrolled Students (${students.length})'),
+                  label: const Text('View Enrolled Students  '),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,

@@ -22,6 +22,7 @@ class _TeacherDetailScreenState extends State<TeacherDetailScreen> {
           .collection('courses')
           .where('teacherId', isEqualTo: teacherId)
           .where('isActive', isEqualTo: true)
+          .where('isdelet', isEqualTo: false)
           .get();
 
       return snapshot.docs.map((doc) {

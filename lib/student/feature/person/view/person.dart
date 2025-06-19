@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_academy/shared/theme/apptheme.dart';
+import 'package:smart_academy/shared/widget/select%20_category.dart';
 import 'package:smart_academy/student/feature/authentication/model/firebaseFunctionUser.dart';
+import 'package:smart_academy/student/feature/authentication/model/model_user.dart';
 import 'package:smart_academy/student/feature/authentication/view/screen_ui/login/login.dart';
 import 'package:smart_academy/student/feature/authentication/view_model/auth_bloc.dart';
 
 class Person extends StatefulWidget {
+  // إذا كنت تريد تمرير نموذج المستخدم، يمكنك إضافته هنا
+
+  // إذا لم يكن هناك حاجة لتمرير النموذج، يمكنك إزالة هذا المتغير
+
   const Person({super.key});
+  // يمكنك إزالة هذا إذا لم يكن هناك حاجة لتمرير النموذج
 
   @override
   State<Person> createState() => _PersonState();
@@ -300,6 +307,6 @@ class _PersonState extends State<Person> {
 
   void logout() {
     FunctionFirebaseUser.logout();
-    Navigator.of(context).pushReplacementNamed(Login.routeName);
+    Navigator.of(context).pushReplacementNamed(SelectCategory.routeName);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:smart_academy/student/feature/authentication/model/model_user.dart';
 
 class FunctionFirebaseUser {
@@ -63,6 +64,54 @@ class FunctionFirebaseUser {
       await FirebaseAuth.instance.signOut();
     } catch (e) {
       throw Exception('Error during logout: $e');
+    }
+  }
+
+  static Future<ModelUser> signInWithGoogle() async {
+    try {
+      // بدء عملية تسجيل الدخول باستخدام Google
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw Exception('Google Sign-In cancelled');
+      }
+
+      // الحصول على بيانات المصادقة
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // تسجيل الدخول إلى Firebase
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final User user = userCredential.user!;
+
+      // التحقق مما إذا كان المستخدم موجودًا في Firestore
+      final CollectionReference<ModelUser> userCollection = getCollectionUser();
+      final DocumentSnapshot<ModelUser> userDoc =
+          await userCollection.doc(user.uid).get();
+
+      if (userDoc.exists) {
+        // إرجاع بيانات المستخدم إذا كان موجودًا
+        return userDoc.data()!;
+      } else {
+        // إنشاء مستخدم جديد في Firestore
+        final ModelUser modelUser = ModelUser(
+          id: user.uid,
+          name: user.displayName ?? 'No Name',
+          email: user.email ?? '',
+          numberId: '', // يمكنك طلب هذا الحقل لاحقًا إذا لزم الأمر
+          courses: [],
+        );
+        await userCollection.doc(user.uid).set(modelUser);
+        return modelUser;
+      }
+    } catch (e) {
+      throw Exception('Error during Google Sign-In: $e');
     }
   }
 }

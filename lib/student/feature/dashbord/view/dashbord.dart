@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:smart_academy/cousrses/ControllerCourse.dart';
 import 'package:smart_academy/student/feature/dashbord/view/MyCourses/CourseDetail.dart';
 import 'package:smart_academy/student/feature/dashbord/view/courses/Course_Screen.dart';
+import 'package:smart_academy/student/feature/authentication/model/model_user.dart';
 
 class Dashbord extends StatefulWidget {
   const Dashbord({super.key});
@@ -66,179 +68,112 @@ class _DashbordState extends State<Dashbord> {
           ),
         ),
         padding: const EdgeInsets.all(16),
-        child: StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('user')
-              .doc(user!.uid) // Get the user document
-              .snapshots(),
-          builder: (context, userSnapshot) {
-            if (userSnapshot.connectionState == ConnectionState.waiting) {
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: CourseController()
+              .getCoursesForStudent(user!.uid), // Call the method here
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
             }
 
-            if (userSnapshot.hasError) {
+            if (snapshot.hasError) {
               return Center(
-                child: Text('Error: ${userSnapshot.error}'),
+                child: Text('Error: ${snapshot.error}'),
               );
             }
 
-            if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
-              return const Center(child: Text('User not found.'));
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No courses found.'));
             }
 
-            final userData = userSnapshot.data!.data() as Map<String, dynamic>;
-            final courseIds = List<String>.from(userData['courses'] ?? []);
+            final courses = snapshot.data!;
 
-            if (courseIds.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 20),
-                    Text(
-                      'No Courses Registered',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueGrey[700],
-                          ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Tap the button below to browse available courses',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    const SizedBox(height: 30),
-                  ],
-                ),
-              );
-            }
+            return GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.9,
+              ),
+              itemCount: courses.length,
+              itemBuilder: (context, index) {
+                final courseData = courses[index];
+                final courseId = courseData['id'];
+                final courseName = courseData['name'] ?? 'Unnamed Course';
+                final courseCode = courseData['courseCode'] ?? 'No Code';
+                final coursePrice = 50; // Hardcoded price for all courses
 
-            return StreamBuilder<List<DocumentSnapshot>>(
-              stream: FirebaseFirestore.instance
-                  .collection('courses')
-                  .where(FieldPath.documentId, whereIn: courseIds)
-                  .snapshots()
-                  .map((querySnapshot) =>
-                      querySnapshot.docs) // Get all course documents
-              ,
-              builder: (context, courseSnapshot) {
-                if (courseSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                if (courseSnapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${courseSnapshot.error}'),
-                  );
-                }
-
-                if (!courseSnapshot.hasData || courseSnapshot.data!.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            size: 50, color: Colors.red),
-                        const SizedBox(height: 20),
-                        Text('No courses found.'),
-                      ],
-                    ),
-                  );
-                }
-
-                final courses = courseSnapshot.data!;
-
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    setState(() {});
-                    await Future.delayed(const Duration(seconds: 1));
-                  },
-                  child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.9,
-                    ),
-                    itemCount: courses.length,
-                    itemBuilder: (context, index) {
-                      final courseData =
-                          courses[index].data() as Map<String, dynamic>;
-                      final courseId = courses[index].id;
-                      final courseName = courseData['name'] ?? 'Unnamed Course';
-                      final courseCode = courseData['courseCode'] ?? 'No Code';
-
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CourseDetailWithGradesScreen(
-                                courseId: courseId,
-                                studentId: user!.uid,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.blue.withOpacity(0.8),
-                                  Colors.blue.withOpacity(0.4),
-                                ],
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Icon(Icons.school,
-                                      size: 30, color: Colors.white),
-                                  const Spacer(),
-                                  Text(
-                                    courseName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    courseCode,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white.withOpacity(0.9),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                return InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CourseDetailWithGradesScreen(
+                          courseId: courseId,
+                          studentId: user!.uid,
                         ),
-                      );
-                    },
+                      ),
+                    );
+                  },
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.blue.withOpacity(0.8),
+                            Colors.blue.withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(Icons.school, size: 30, color: Colors.white),
+                            const Spacer(),
+                            Text(
+                              courseName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              courseCode,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "\$ $coursePrice", // Display course price
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 );
               },

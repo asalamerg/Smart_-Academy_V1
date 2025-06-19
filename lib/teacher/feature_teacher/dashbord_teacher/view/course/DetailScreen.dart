@@ -296,51 +296,51 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                 const SizedBox(height: 20),
 
                 // زر رفع ملفات PDF
-                ElevatedButton.icon(
-                  onPressed: _pickAndUploadPDF,
-                  icon: const Icon(Icons.upload_file),
-                  label: const Text('Upload PDF'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                // ElevatedButton.icon(
+                //   onPressed: _pickAndUploadPDF,
+                //   icon: const Icon(Icons.upload_file),
+                //   label: const Text('Upload PDF'),
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.green,
+                //     foregroundColor: Colors.white,
+                //     padding: const EdgeInsets.symmetric(vertical: 16),
+                //     shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(12)),
+                //   ),
+                // ),
+                // const SizedBox(height: 20),
 
                 // عرض ملفات PDF المرفوعة
-                if (pdfUrls.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      'No PDF files uploaded yet.',
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontStyle: FontStyle.italic),
-                    ),
-                  )
-                else
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Uploaded Files:',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      for (var url in pdfUrls)
-                        ListTile(
-                          leading: const Icon(Icons.picture_as_pdf,
-                              color: Colors.red),
-                          title: Text(url.split('/').last,
-                              overflow: TextOverflow.ellipsis),
-                          onTap: () => _launchURL(url),
-                        ),
-                    ],
-                  ),
-                const SizedBox(height: 30),
+                // if (pdfUrls.isEmpty)
+                //   const Padding(
+                //     padding: EdgeInsets.symmetric(vertical: 16),
+                //     child: Text(
+                //       'No PDF files uploaded yet.',
+                //       style: TextStyle(
+                //           fontSize: 14,
+                //           color: Colors.black54,
+                //           fontStyle: FontStyle.italic),
+                //     ),
+                //   )
+                // else
+                //   Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       const Text('Uploaded Files:',
+                //           style: TextStyle(
+                //               fontSize: 16, fontWeight: FontWeight.bold)),
+                //       const SizedBox(height: 8),
+                //       for (var url in pdfUrls)
+                //         ListTile(
+                //           leading: const Icon(Icons.picture_as_pdf,
+                //               color: Colors.red),
+                //           title: Text(url.split('/').last,
+                //               overflow: TextOverflow.ellipsis),
+                //           onTap: () => _launchURL(url),
+                //         ),
+                //     ],
+                //   ),
+                // const SizedBox(height: 30),
 
                 // زر عرض قائمة الطلاب المفتوحة
                 ElevatedButton.icon(

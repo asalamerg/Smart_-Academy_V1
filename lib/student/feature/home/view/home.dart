@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:smart_academy/chat/main_chat_screen.dart';
 import 'package:smart_academy/shared/theme/apptheme.dart';
-import 'package:smart_academy/student/feature/Notifications/view/notifications.dart';
+import 'package:smart_academy/student/feature/authentication/model/model_user.dart';
 import 'package:smart_academy/student/feature/dashbord/view/dashbord.dart';
 import 'package:smart_academy/student/feature/person/view/person.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = "home";
 
-  const HomeScreen({super.key});
+  const HomeScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -16,48 +18,38 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final _pageController = PageController();
 
+  // Create a list of pages to switch between without using PageView
   final List<Widget> _pages = [
     Dashbord(),
     MainChatScreen(),
-    Notifications(),
-    const Person(),
+    Person(),
   ];
 
+  // Titles for AppBar based on selected index
   final List<String> _pageTitles = [
     "My Courses",
     "Messages",
-    "Notifications",
     "Profile",
   ];
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: _buildAppBar(context),
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(), // Disable swipe
-        children: _pages,
-      ),
+      appBar: _buildAppBar(),
+      body: _pages[_selectedIndex], // Directly use the selected page
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
+      automaticallyImplyLeading: false,
       backgroundColor: AppTheme.blu,
       title: Text(
-        _pageTitles[_selectedIndex],
+        _pageTitles[_selectedIndex], // Show title based on selected page
         style: const TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.w600,
@@ -66,19 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       centerTitle: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(20),
-        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
       ),
-      actions: [
-        if (_selectedIndex == 0) // Show only on dashboard
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {
-              // Add search functionality
-            },
-          ),
-      ],
     );
   }
 
@@ -102,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: (index) {
             setState(() {
               _selectedIndex = index;
-              _pageController.jumpToPage(index);
             });
           },
           type: BottomNavigationBarType.fixed,
@@ -157,39 +137,10 @@ class _HomeScreenState extends State<HomeScreen> {
               label: "Chat",
             ),
             BottomNavigationBarItem(
-              icon: Badge(
-                backgroundColor: Colors.red,
-                label: const Text("3"), // Dynamic count can be added
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: _selectedIndex == 2
-                        ? AppTheme.blu.withOpacity(0.2)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.notifications_outlined),
-                ),
-              ),
-              activeIcon: Badge(
-                backgroundColor: Colors.red,
-                label: const Text("3"),
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: AppTheme.blu.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.notifications),
-                ),
-              ),
-              label: "Alerts",
-            ),
-            BottomNavigationBarItem(
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: _selectedIndex == 3
+                  color: _selectedIndex == 2
                       ? AppTheme.blu.withOpacity(0.2)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),

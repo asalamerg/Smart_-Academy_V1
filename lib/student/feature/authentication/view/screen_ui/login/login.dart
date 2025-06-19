@@ -64,6 +64,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     final onPrimary = theme.colorScheme.onPrimary;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(50, 0, 0, 0),

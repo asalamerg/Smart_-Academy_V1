@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'package:smart_academy/shared/widget/validation.dart';
+import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view/login_teacher.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_bloc_teacher.dart';
 import 'package:smart_academy/teacher/feature_teacher/authentication_teacher/view_model/auth_teacher_state.dart';
 import 'package:smart_academy/teacher/feature_teacher/screen_home_teacher/view/screen_home_teacher.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class RegisterTeacher extends StatefulWidget {
   static const String routeName = "RegisterTeacher";
@@ -55,7 +56,10 @@ class _RegisterTeacherState extends State<RegisterTeacher> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () => Navigator.of(context).maybePop(),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginTeacher()),
+          ),
           splashRadius: 22,
         ),
       ),
@@ -212,6 +216,8 @@ class _RegisterTeacherState extends State<RegisterTeacher> {
                         );
                       },
                     ),
+                    const SizedBox(height: 20),
+                    _buildGoogleSignInButton(),
                   ],
                 ),
               ),
@@ -277,5 +283,27 @@ class _RegisterTeacherState extends State<RegisterTeacher> {
         email: emailController.text.trim(),
       );
     }
+  }
+
+  // Button for Google Sign In
+  Widget _buildGoogleSignInButton() {
+    return ElevatedButton.icon(
+      onPressed: _signInWithGoogle,
+      icon: const Icon(Icons.login),
+      label: const Text("Sign Up with Google"),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red.shade600,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+      ),
+    );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    // Implement your Google Sign-In logic here, redirect to CompleteProfileTeacherScreen if necessary
+    await BlocProvider.of<AuthBlocTeacher>(context)
+        .signInWithGoogleTeacher(context);
   }
 }

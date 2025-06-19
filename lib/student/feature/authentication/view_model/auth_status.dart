@@ -2,22 +2,34 @@ abstract class AuthStatus {}
 
 class AuthInitial extends AuthStatus {}
 
-class AuthChangeUser extends AuthStatus {}
-
 class LoginAuthLoading extends AuthStatus {}
-
-class LoginAuthError extends AuthStatus {
-  String error;
-  LoginAuthError({required this.error});
-}
 
 class LoginAuthSuccess extends AuthStatus {}
 
+class LoginAuthError extends AuthStatus {
+  final String error;
+  LoginAuthError({required this.error});
+}
+
 class RegisterAuthLoading extends AuthStatus {}
 
+class RegisterAuthSuccess extends AuthStatus {}
+
 class RegisterAuthError extends AuthStatus {
-  String error;
+  final String error;
   RegisterAuthError({required this.error});
 }
 
-class RegisterAuthSuccess extends AuthStatus {}
+class GoogleSignInLoading extends AuthStatus {}
+
+class GoogleSignInSuccess extends AuthStatus {}
+
+class GoogleSignInError extends AuthStatus {
+  final String error;
+  GoogleSignInError({required this.error});
+}
+
+// Add this new status to indicate that Google user needs to complete their profile
+class GoogleUserNeedsProfileCompletion extends AuthStatus {}
+
+class GoogleUserLoginSuccess extends AuthStatus {}

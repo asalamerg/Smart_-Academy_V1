@@ -116,6 +116,50 @@ class CourseController {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getCoursesForStudent(
+      String studentId) async {
+    try {
+      // أولاً، احصل على المستند الخاص بالطالب من الـ Firestore
+      final studentDoc =
+          await _firestore.collection('user').doc(studentId).get();
+
+      if (!studentDoc.exists) {
+        print("Student not found.");
+        return [];
+      }
+
+      // الآن احصل على الكورسات المسجلة للطالب من الـ field 'courses' في المستند
+      final courses = List<String>.from(studentDoc.data()?['courses'] ?? []);
+
+      if (courses.isEmpty) {
+        print("No courses found for this student.");
+        return [];
+      }
+
+      // الآن احصل على الكورسات بناءً على الـ courseId
+      final courseSnapshot = await _firestore
+          .collection('courses')
+          .where(FieldPath.documentId,
+              whereIn: courses) // Use whereIn to fetch courses
+          .where('isActive', isEqualTo: true) // Ensure the course is active
+          .where('isdelet',
+              isEqualTo: false) // Ensure the course is not deleted
+          .get();
+
+      List<Map<String, dynamic>> courseData = [];
+      for (var doc in courseSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id; // Add course ID for further reference
+        courseData.add(data);
+      }
+
+      return courseData;
+    } catch (e) {
+      print("Error fetching courses for student: $e");
+      return [];
+    }
+  }
+
   // Function to toggle course active status
   Future<void> toggleCourseActiveStatus(String courseId, bool isActive) async {
     try {

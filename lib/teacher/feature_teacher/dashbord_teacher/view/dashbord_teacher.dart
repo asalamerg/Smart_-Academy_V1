@@ -40,6 +40,7 @@ class _DashbordTeacherState extends State<DashbordTeacher> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _courseController.getCoursesForTeacher(widget.teacher.id),
         builder: (context, snapshot) {
@@ -55,8 +56,22 @@ class _DashbordTeacherState extends State<DashbordTeacher> {
 
           if (courses.isEmpty) {
             return Center(
-                child: Text(
-                    'No courses found for teacher ID: ${widget.teacher.id}'));
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/image/empty.png',
+                    width: 200,
+                    height: 200,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'No courses available',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ],
+              ),
+            );
           }
 
           return ListView.builder(

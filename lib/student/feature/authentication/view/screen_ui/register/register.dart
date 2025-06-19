@@ -43,7 +43,7 @@ class DefaultButton extends StatelessWidget {
   }
 }
 
-// Default TextFormField Widget (unchanged)
+// Default TextFormField Widget
 class DefaultTextFormField extends StatefulWidget {
   final String title;
   final TextEditingController controller;
@@ -114,7 +114,7 @@ class _DefaultTextFormFieldState extends State<DefaultTextFormField> {
   }
 }
 
-// Register Screen (without Loading widget or animation)
+// Register Screen
 class Register extends StatefulWidget {
   static const String routeName = "register";
 
@@ -221,10 +221,25 @@ class _RegisterState extends State<Register> {
                       const SizedBox(height: 32),
                       BlocConsumer<AuthBloc, AuthStatus>(
                         listener: (context, state) {
-                          if (state is RegisterAuthSuccess) {
+                          print(
+                              'AuthBloc state: $state'); // طباعة حالة AuthBloc
+                          if (state is RegisterAuthSuccess ||
+                              state is GoogleSignInSuccess) {
+                            print('Navigation to HomeScreen triggered');
                             Navigator.of(context)
                                 .pushReplacementNamed(HomeScreen.routeName);
                           } else if (state is RegisterAuthError) {
+                            print('Register error: ${state.error}');
+                            Fluttertoast.showToast(
+                              msg: state.error,
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.TOP,
+                              backgroundColor: Colors.redAccent,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                          } else if (state is GoogleSignInError) {
+                            print('Google Sign-In error: ${state.error}');
                             Fluttertoast.showToast(
                               msg: state.error,
                               toastLength: Toast.LENGTH_LONG,
@@ -236,15 +251,57 @@ class _RegisterState extends State<Register> {
                           }
                         },
                         builder: (context, state) {
-                          return DefaultButton(
-                            onPressed:
-                                state is RegisterAuthLoading ? null : register,
-                            title: "Register",
+                          print(
+                              'Building with state: $state'); // طباعة حالة البناء
+                          return Column(
+                            children: [
+                              DefaultButton(
+                                onPressed: state is RegisterAuthLoading
+                                    ? null
+                                    : () {
+                                        print('Register button pressed');
+                                        register();
+                                      },
+                                title: "Register",
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    "Login with google? ",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: state is GoogleSignInLoading
+                                        ? null
+                                        : () {
+                                            print(
+                                                'Google Sign-In button pressed');
+                                            try {
+                                              BlocProvider.of<AuthBloc>(context)
+                                                  .registerWithGoogle(context);
+                                            } catch (e) {
+                                              print(
+                                                  'Error triggering Google Sign-In: $e');
+                                            }
+                                          },
+                                    // title: "Sign in with Google",
+                                    icon: Image.asset(
+                                      'assets/image/google-symbol.png',
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           );
                         },
                       ),
-                      const SizedBox(height: 16),
-                      // Add Google sign-in button
                     ],
                   ),
                 ),
@@ -257,18 +314,30 @@ class _RegisterState extends State<Register> {
   }
 
   void register() {
+    print('Register function called');
     if (formKey.currentState!.validate()) {
-      BlocProvider.of<AuthBloc>(context).registerViewModel(
-        name: nameController.text,
-        password: passwordController.text,
-        numberId: idController.text,
-        email: emailController.text,
-      );
+      print('Form validated, registering with: '
+          'name=${nameController.text}, '
+          'email=${emailController.text}, '
+          'numberId=${idController.text}');
+      try {
+        BlocProvider.of<AuthBloc>(context).registerViewModel(
+          name: nameController.text,
+          password: passwordController.text,
+          numberId: idController.text,
+          email: emailController.text,
+        );
+      } catch (e) {
+        print('Error in register function: $e');
+      }
+    } else {
+      print('Form validation failed');
     }
   }
 
   @override
   void dispose() {
+    print('Disposing Register screen controllers');
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();

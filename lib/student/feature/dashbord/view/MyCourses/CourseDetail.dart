@@ -214,13 +214,13 @@ class CourseDetailWithGradesScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildCourseInfoCard(
-                        title: 'Enrolled Students',
-                        value: students.length.toString(),
-                        icon: Icons.person_add,
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: _buildCourseInfoCard(
+                    //     title: 'Enrolled Students',
+                    //     value: students.length.toString(),
+                    //     icon: Icons.person_add,
+                    //   ),
+                    // ),
                   ],
                 ),
 

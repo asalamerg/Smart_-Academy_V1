@@ -7,27 +7,30 @@ import 'package:smart_academy/shared/error/error.dart';
 import 'package:smart_academy/shared/loading/loading_indicator.dart';
 
 class ListViewItem extends StatelessWidget {
-
-
-
   const ListViewItem({super.key});
 
   @override
   Widget build(BuildContext context) {
     final viewModelRoom = context.watch<RoomViewModel>(); // بدلًا من إنشائه
 
-    return BlocBuilder<RoomViewModel,StatusRoom>(
+    return BlocBuilder<RoomViewModel, StatusRoom>(
       builder: (context, state) {
-        if(state is GetRoomLoading){return const LoadingIndicator();}
-        else if(state is GetRoomError){return ErrorIndicator(message: state.message,);}
-        else {
+        if (state is GetRoomLoading) {
+          return const LoadingIndicator();
+        } else if (state is GetRoomError) {
+          return ErrorIndicator(
+            message: state.message,
+          );
+        } else {
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2),
             itemBuilder: (context, index) =>
                 ItemRoom(roomModel: viewModelRoom.rooms[index]),
-            itemCount: viewModelRoom.rooms.length,);
-        }},
+            itemCount: viewModelRoom.rooms.length,
+          );
+        }
+      },
     );
   }
 }

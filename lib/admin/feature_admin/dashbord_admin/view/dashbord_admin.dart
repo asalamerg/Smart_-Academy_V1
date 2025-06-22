@@ -19,6 +19,7 @@ class DashbordAdmin extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome Section
+              const SizedBox(height: 72),
               _buildWelcomeSection(context),
 
               const SizedBox(height: 32),
@@ -34,8 +35,6 @@ class DashbordAdmin extends StatelessWidget {
                   ),
                 ),
               ),
-
-              const SizedBox(height: 16),
 
               // Grid of Action Cards
               GridView.count(
@@ -104,7 +103,7 @@ class DashbordAdmin extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Statistics Section (Placeholder for future implementation)
-              _buildStatisticsSection(context),
+              // _buildStatisticsSection(context),
             ],
           ),
         ),
@@ -238,55 +237,55 @@ class DashbordAdmin extends StatelessWidget {
     );
   }
 
-  Widget _buildStatisticsSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            'Academy Overview',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
-                ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-          childAspectRatio: 1.5,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          children: [
-            _buildStatCard(
-              context,
-              value: '24',
-              label: 'Active Teachers',
-              icon: Icons.person,
-              color: Colors.blue,
-            ),
-            _buildStatCard(
-              context,
-              value: '156',
-              label: 'Enrolled Students',
-              icon: Icons.people,
-              color: Colors.green,
-            ),
-            _buildStatCard(
-              context,
-              value: '18',
-              label: 'Available Courses',
-              icon: Icons.school,
-              color: Colors.orange,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // Widget _buildStatisticsSection(BuildContext context) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8.0),
+  //         child: Text(
+  //           'Academy Overview',
+  //           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+  //                 fontWeight: FontWeight.bold,
+  //                 color: Theme.of(context).primaryColor,
+  //               ),
+  //         ),
+  //       ),
+  //       const SizedBox(height: 16),
+  //       GridView.count(
+  //         shrinkWrap: true,
+  //         physics: NeverScrollableScrollPhysics(),
+  //         crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+  //         childAspectRatio: 1.5,
+  //         crossAxisSpacing: 16,
+  //         mainAxisSpacing: 16,
+  //         children: [
+  //           _buildStatCard(
+  //             context,
+  //             value: '24',
+  //             label: 'Active Teachers',
+  //             icon: Icons.person,
+  //             color: Colors.blue,
+  //           ),
+  //           _buildStatCard(
+  //             context,
+  //             value: '156',
+  //             label: 'Enrolled Students',
+  //             icon: Icons.people,
+  //             color: Colors.green,
+  //           ),
+  //           _buildStatCard(
+  //             context,
+  //             value: '18',
+  //             label: 'Available Courses',
+  //             icon: Icons.school,
+  //             color: Colors.orange,
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildStatCard(
     BuildContext context, {

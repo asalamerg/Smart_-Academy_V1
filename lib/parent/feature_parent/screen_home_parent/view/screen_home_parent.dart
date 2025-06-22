@@ -13,62 +13,124 @@ class ScreenHomeParent extends StatefulWidget {
 }
 
 class _ScreenHomeParentState extends State<ScreenHomeParent> {
-  int select = 0;
-  List<Widget> item = [
-    DashbordParent(),
-    MainChatScreen(),
-    PersonParent(),
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = [
+    const DashbordParent(),
+    const MainChatScreen(),
+    const PersonParent(),
   ];
+
+  final List<String> _appBarTitles = [
+    "Doshboard",
+    "chat",
+    "Profilae",
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/image/background.png"), fit: BoxFit.fill),
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          leading: Container(),
-          title: Text(
-            item[select].toString(),
-            style: Theme.of(context).textTheme.displayLarge,
-          ),
-          centerTitle: true,
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
+        title: Text(
+          _appBarTitles[_selectedIndex],
+          style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                color: AppTheme.primaryText,
+                fontWeight: FontWeight.bold,
+              ),
         ),
-        body: item[select],
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/image/background.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/image/background.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: _screens[_selectedIndex],
+      ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
 
-        bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.shifting,
-            selectedItemColor: AppTheme.blu,
-            unselectedItemColor: Colors.black,
-            currentIndex: select,
-            onTap: (index) {
-              select = index;
-              setState(() {});
-            },
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.dashboard,
-                  size: 35,
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, -3),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) => setState(() => _selectedIndex = index),
+          backgroundColor: Colors.white,
+          selectedItemColor: AppTheme.primary,
+          unselectedItemColor: Colors.grey[600],
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          type: BottomNavigationBarType.fixed,
+          items: [
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _selectedIndex == 0
+                      ? AppTheme.primary.withOpacity(0.2)
+                      : Colors.transparent,
                 ),
-                label: "DashBord",
+                child: const Icon(Icons.dashboard),
               ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.chat,
-                  size: 35,
+              label: "Doshboard",
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _selectedIndex == 1
+                      ? AppTheme.primary.withOpacity(0.2)
+                      : Colors.transparent,
                 ),
-                label: "chat",
+                child: const Icon(Icons.chat),
               ),
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.person,
-                    size: 35,
-                  ),
-                  label: "person"),
-            ]),
-        // appBar: AppBar(title: Text("Welcome"),),
+              label: "chat",
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _selectedIndex == 2
+                      ? AppTheme.primary.withOpacity(0.2)
+                      : Colors.transparent,
+                ),
+                child: const Icon(Icons.person),
+              ),
+              label: "  Profilae",
+            ),
+          ],
+        ),
       ),
     );
   }

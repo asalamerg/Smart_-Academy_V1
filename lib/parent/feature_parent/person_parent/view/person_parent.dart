@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:smart_academy/parent/feature_parent/authentication_parent/model/firebase_parent.dart';
+import 'package:smart_academy/parent/feature_parent/authentication_parent/model/model_parent.dart';
 import 'package:smart_academy/parent/feature_parent/authentication_parent/view/login_parent.dart';
 import 'package:smart_academy/parent/feature_parent/authentication_parent/view_model/bloc_auth_parent.dart';
-import 'package:smart_academy/parent/feature_parent/dashbord_parent/view/dashbord_parent.dart';
 import 'package:smart_academy/student/feature/authentication/Controller/StudentsController.dart';
 import 'package:smart_academy/student/feature/authentication/model/model_user.dart';
 
@@ -44,21 +45,6 @@ class _PersonParentState extends State<PersonParent>
     final displaySmall = Theme.of(context).textTheme.displaySmall;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Parent Profile"),
-        backgroundColor: Colors.blue.shade700,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            tooltip: 'View Student Courses',
-            onPressed: () {
-              Navigator.pushNamed(context, DashbordParent.routeName);
-            },
-          ),
-        ],
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -77,12 +63,15 @@ class _PersonParentState extends State<PersonParent>
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  const SizedBox(height: 90),
                   // Profile Header
                   Card(
                     elevation: 6,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    color: Colors.white,
+                    shadowColor: Colors.grey.withOpacity(0.2),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -140,8 +129,8 @@ class _PersonParentState extends State<PersonParent>
                           ),
                           const SizedBox(height: 10),
                           FutureBuilder<ModelUser?>(
-                            future: StudentController.getStudentById(
-                                parent?.linkedStudentUid),
+                            future: StudentController()
+                                .getStudentById(parent?.numberId),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -218,7 +207,7 @@ class _PersonParentState extends State<PersonParent>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 250),
 
                   // Logout Button
                   Center(
@@ -258,6 +247,7 @@ class _PersonParentState extends State<PersonParent>
                       ),
                     ),
                   ),
+                  const SizedBox(height: 90),
                 ],
               ),
             ),

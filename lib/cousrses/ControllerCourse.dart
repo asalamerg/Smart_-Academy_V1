@@ -160,6 +160,61 @@ class CourseController {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getCoursesForStudentToPar(
+      String studentNId) async {
+    try {
+      final student = await _firestore
+          .collection('user')
+          // Use whereIn to fetch courses
+          .where('numberId', isEqualTo: studentNId) // get the id of the student
+          .get();
+      if (student.docs.isEmpty) {
+        print("Student not found.");
+        return [];
+      }
+      // احصل على الـ studentId من المستند
+      final studentId = student.docs.first.id;
+      // أولاً، احصل على المستند الخاص بالطالب من الـ Firestore
+      final studentDoc =
+          await _firestore.collection('user').doc(studentId).get();
+
+      if (!studentDoc.exists) {
+        print("Student not found.");
+        return [];
+      }
+
+      // الآن احصل على الكورسات المسجلة للطالب من الـ field 'courses' في المستند
+      final courses = List<String>.from(studentDoc.data()?['courses'] ?? []);
+
+      if (courses.isEmpty) {
+        print("No courses found for this student.");
+        return [];
+      }
+
+      // الآن احصل على الكورسات بناءً على الـ courseId
+      final courseSnapshot = await _firestore
+          .collection('courses')
+          .where(FieldPath.documentId,
+              whereIn: courses) // Use whereIn to fetch courses
+          .where('isActive', isEqualTo: true) // Ensure the course is active
+          .where('isdelet',
+              isEqualTo: false) // Ensure the course is not deleted
+          .get();
+
+      List<Map<String, dynamic>> courseData = [];
+      for (var doc in courseSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id; // Add course ID for further reference
+        courseData.add(data);
+      }
+
+      return courseData;
+    } catch (e) {
+      print("Error fetching courses for student: $e");
+      return [];
+    }
+  }
+
   // Function to toggle course active status
   Future<void> toggleCourseActiveStatus(String courseId, bool isActive) async {
     try {
@@ -240,26 +295,26 @@ class CourseController {
   }
 
   // Function to enroll a student in a course
-  // Future<void> enrollStudentInCourse(String courseId, String studentId) async {
-  //   try {
-  //     DocumentSnapshot courseDoc =
-  //         await _firestore.collection('courses').doc(courseId).get();
-  //     if (courseDoc.exists) {
-  //       bool canEnroll = courseDoc['canEnroll'] ?? false;
-  //       if (!canEnroll) {
-  //         print("Enrollment is closed for this course.");
-  //         return;
-  //       }
-  //     }
+  Future<void> enrollStudentInCourse(String courseId, String studentId) async {
+    try {
+      DocumentSnapshot courseDoc =
+          await _firestore.collection('courses').doc(courseId).get();
+      if (courseDoc.exists) {
+        bool canEnroll = courseDoc['canEnroll'] ?? false;
+        if (!canEnroll) {
+          print("Enrollment is closed for this course.");
+          return;
+        }
+      }
 
-  //     await _firestore.collection('courses').doc(courseId).update({
-  //       'students': FieldValue.arrayUnion([studentId]),
-  //     });
-  //     print("Student enrolled successfully");
-  //   } catch (e) {
-  //     print("Error enrolling student: $e");
-  //   }
-  // }
+      await _firestore.collection('courses').doc(courseId).update({
+        'students': FieldValue.arrayUnion([studentId]),
+      });
+      print("Student enrolled successfully");
+    } catch (e) {
+      print("Error enrolling student: $e");
+    }
+  }
 
   // Function to remove a student from a course
   Future<void> removeStudentFromCourse(

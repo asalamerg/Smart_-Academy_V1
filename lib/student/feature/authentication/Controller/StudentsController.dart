@@ -22,12 +22,19 @@ class StudentController {
     }
   }
 
-  static Future<ModelUser?> getStudentById(String? studentId) async {
-    if (studentId == null) return null;
+  Future<ModelUser?> getStudentById(String? numberId) async {
+    if (numberId == null) return null;
+
     try {
+      final student = await _firestore
+          .collection('user')
+          // Use whereIn to fetch courses
+          .where('numberId', isEqualTo: numberId) // get the id of the student
+          .get();
+
       final doc = await FirebaseFirestore.instance
           .collection('user')
-          .doc(studentId)
+          .doc(student.docs.first.id)
           .get();
       if (doc.exists) {
         return ModelUser.fromJson(doc.data()!);

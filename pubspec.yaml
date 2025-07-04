@@ -1,39 +1,43 @@
 name: smart_academy
 description: "A new Flutter project."
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+publish_to: "none"
 
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.5.4
+  sdk: ^3.5.4  # يمكنك تحديث هذا إلى ^3.7.0 إذا كنت تستخدم Flutter 3.19+
 
 dependencies:
   flutter:
     sdk: flutter
 
-  firebase_core: ^3.8.0
-  firebase_storage: ^12.4.5
-  google_sign_in: ^6.2.1
-  cloud_firestore: ^5.5.0
-  firebase_auth: ^5.3.3
-  url_launcher: ^6.2.5
+  # حزم Firebase المحدثة
+  firebase_core: ^3.14.0
+  firebase_storage: ^12.4.7
+  google_sign_in: ^6.2.3  # أحدث إصدار
+  cloud_firestore: ^5.6.9
+  firebase_auth: ^5.6.0
+  url_launcher: ^6.2.5  # (الإصدار الحالي هو الأحدث)
+
+  # حزم مساعدة
   loading_indicator: ^3.1.1
-  flutter_slidable: ^3.1.2
-  fluttertoast: ^8.2.12
-  flutter_bloc: ^9.1.0
-  file_picker: ^6.1.1
-  image_picker: ^0.8.5+3
-  intl: ^0.18.1
-  uuid: ^4.0.0
+  fluttertoast: ^8.2.12  # (الإصدار الحالي هو الأحدث)
+  flutter_bloc: ^9.1.1
+
+  # حزم تحتاج تحديثات رئيسية
+  flutter_slidable: ^4.0.0  # تحديث رئيسي
+  image_picker: ^1.1.2     # تحديث رئيسي
+  intl: ^0.20.2           # تحديث رئيسي
+  uuid: ^4.0.0            # (الإصدار الحالي هو الأحدث)
 
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_native_splash: ^2.4.0
-  flutter_launcher_icons: ^0.14.3
-  flutter_lints: ^4.0.0
+  flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^5.0.0   # أو 6.0.0 إذا كنت تستخدم Flutter 3.19+
 
 flutter:
   uses-material-design: true
@@ -41,3 +45,4 @@ flutter:
   assets:
     - assets/image/google-symbol.png
     - assets/image/empty.png
+    - assets/image/

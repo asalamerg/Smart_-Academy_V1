@@ -1,0 +1,2 @@
+C:/smart_academy/android/app/.cxx/Debug/z3w241a5/x86_64/CMakeFiles/edit_cache.dir
+C:/smart_academy/android/app/.cxx/Debug/z3w241a5/x86_64/CMakeFiles/rebuild_cache.dir

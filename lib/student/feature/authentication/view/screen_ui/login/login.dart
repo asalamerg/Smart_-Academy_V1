@@ -90,7 +90,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             decoration: BoxDecoration(
               image: const DecorationImage(
                 image: AssetImage("assets/image/background.png"),
-                fit: BoxFit.cover,
+                fit: BoxFit.fill,
               ),
               gradient: LinearGradient(
                 colors: [

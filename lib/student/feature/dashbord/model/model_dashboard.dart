@@ -13,3 +13,4 @@ class ModelDashboard {
       required this.complete,
       required this.primary});
 }
+
